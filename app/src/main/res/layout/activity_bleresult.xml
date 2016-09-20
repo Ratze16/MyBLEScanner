@@ -7,29 +7,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.riesenbeck.myblescanner.MainActivity">
+    tools:context=".BLEResultActivity">
 
-    <ListView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/lv_BLE"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/tBtn_scanBLE" />
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/scanBLE"
-        android:id="@+id/tBtn_scanBLE"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_Device"
         android:layout_alignParentTop="true"
-        android:checked="false" />
+        android:layout_alignParentStart="true" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/clrBLEList"
-        android:id="@+id/btn_clrBLEList"
-        android:layout_above="@+id/lv_BLE"
-        android:layout_alignParentEnd="true" />
-
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/tv_DeviceInfo"
+        android:layout_below="@+id/tv_Device"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

@@ -2,4 +2,6 @@
     <string name="app_name">MyBLEScanner</string>
     <string name="BLE_not_supported">BLE is not supported</string>
     <string name="scanBLE">Scan BLE</string>
+    <string name="position">Position</string>
+    <string name="clrBLEList">Clear BLE List</string>
 </resources>

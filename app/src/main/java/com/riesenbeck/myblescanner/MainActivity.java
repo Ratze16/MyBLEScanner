@@ -1,7 +1,6 @@
 package com.riesenbeck.myblescanner;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -13,74 +12,49 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
+import com.riesenbeck.myblescanner.Data.BLEResults;
+
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity {
 
+    //View
     private ListView lvBLE;
     private ToggleButton tBtnScanBLE;
+    private Button btnClrBLEList;
     private ArrayAdapter<String> arrayAdapter;
 
+    //BLE Scan
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private List<ScanFilter> scanFilters;
     private ScanSettings scanSettings;
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback(){
-
-        @Override
-        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-            bleDeviceResults.add(new BLEDeviceResult(device, rssi,scanRecord));
-        }
-    };
-    private ScanCallback mScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            super.onScanResult(callbackType, result);
-            bleDeviceResult = new BLEDeviceResult(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes());
-            bleDeviceResults.add(bleDeviceResult);
-            bleDeviceStringList.add(bleDeviceResult.toString());
-
-        }
-
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {
-            super.onBatchScanResults(results);
-        }
-
-        @Override
-        public void onScanFailed(int errorCode) {
-            super.onScanFailed(errorCode);
-        }
-    };
-
+    //BLE Data
     private BLEDeviceResult bleDeviceResult;
-    private List<BLEDeviceResult> bleDeviceResults = new ArrayList<BLEDeviceResult>();
-    private List<String> bleDeviceStringList = new ArrayList<String>();
+    private BLEResults bleResultsRef;
 
-    private final int DELAY = 1000;
     private Handler mHandler;
-
-    private Runnable refresh = new Runnable(){
-        @Override
-        public void run() {
-            mHandler.postDelayed(this,DELAY);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initBLE();
-        mHandler = new Handler();
+
+        mHandler = new Handler(Looper.getMainLooper()){
+
+        };
     }
 
     //Checks if the BLE Adapter is initialized and enabled
@@ -106,19 +83,17 @@ public class MainActivity extends AppCompatActivity {
         }else{
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-        lvBLE.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        //Register the OnItemClickListener for the BLEDevices Listview
+        lvBLE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), BLEDeviceResult.class);
-                intent.putExtra("Position", position);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Starts the BLEResult Activity
+                Intent intent = new Intent(getApplicationContext(), BLEResultActivity.class);
+                intent.putExtra(getString(R.string.position), position);
                 startActivity(intent);
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
         });
+        paintBLEList();
     }
 
     //Initialize all GUI Items at Startup
@@ -129,20 +104,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    bleDeviceStringList.clear();
+                    btnClrBLEList.setEnabled(false);
                     scanLEDevices(true);
                 }else{
                     scanLEDevices(false);
-                    arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, bleDeviceStringList);
-                    lvBLE.setAdapter(arrayAdapter);
+                    btnClrBLEList.setEnabled(true);
                 }
+            }
+        });
+        btnClrBLEList = (Button)findViewById(R.id.btn_clrBLEList);
+        btnClrBLEList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bleResultsRef.clearBLEResults();
+                paintBLEList();
             }
         });
     }
 
+
+
     // Checks if the Device supports BLE
     // Initialize the BluetoothManager and the Bluetooth Adapter
     private void initBLE(){
+        bleResultsRef = BLEResults.getInstance();
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)){
             Toast.makeText(this, R.string.BLE_not_supported, Toast.LENGTH_SHORT).show();
             finish();
@@ -155,11 +140,16 @@ public class MainActivity extends AppCompatActivity {
     private void scanLEDevices(boolean start){
 
         if (start) {
-            if(Build.VERSION.SDK_INT<21){
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
-            }else{
-                mBluetoothLeScanner.startScan(scanFilters,scanSettings, mScanCallback);
-            }
+            mHandler.postAtTime(new Runnable() {
+                @Override
+                public void run() {
+                    if(Build.VERSION.SDK_INT<21){
+                        mBluetoothAdapter.startLeScan(mLeScanCallback);
+                    }else{
+                        mBluetoothLeScanner.startScan(scanFilters,scanSettings, mScanCallback);
+                    }
+                }
+            },1);
         } else {
             if(Build.VERSION.SDK_INT<21){
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -169,20 +159,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //A BLE Device
-    private class BLEDeviceResult{
-        private BluetoothDevice bluetoothDevice;
-        private int rssi;
-        private byte[] scanRecord;
-        public BLEDeviceResult(BluetoothDevice bluetoothDevice, int rssi, byte[] scanRecord){
-            this.bluetoothDevice = bluetoothDevice;
-            this.rssi = rssi;
-            this.scanRecord = scanRecord;
+    //Redraw the BLE List
+    private void paintBLEList(){
+        List<String> bleDeviceStringList = new ArrayList<String>();
+        for(BLEDeviceResult bleDeviceResult: bleResultsRef.getBleDeviceResults()){
+            bleDeviceStringList.add(bleDeviceResult.toString());
         }
-        @Override
-        public String toString(){
-            return "Device: "+bluetoothDevice.toString()+ "\nRSSI: "+String.valueOf(rssi)+"\nScanRecord: "+scanRecord.toString();
-        }
+        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, bleDeviceStringList);
+        lvBLE.setAdapter(arrayAdapter);
     }
+
+
+    //BLECallback for API Version <21
+    private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback(){
+        @Override
+        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            try {
+                bleResultsRef.addBLEResult(new BLEDeviceResult(device, rssi,scanRecord,System.nanoTime()));
+                paintBLEList();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+    //BLECallback for API Version >=21
+    private final ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            bleDeviceResult = new BLEDeviceResult(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
+            bleResultsRef.addBLEResult(bleDeviceResult);
+            paintBLEList();
+        }
+    };
+
 
 }
