@@ -9,13 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.riesenbeck.myblescanner.MainActivity">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lv_BLE"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/tBtn_scanBLE" />
-
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,5 +24,21 @@
         android:id="@+id/btn_clrBLEList"
         android:layout_above="@+id/lv_BLE"
         android:layout_alignParentEnd="true" />
+
+    <TextureView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_Camera"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_BLE"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tBtn_scanBLE"
+        android:layout_toStartOf="@+id/btn_clrBLEList"
+        android:background="#80FFFFFF" />
 
 </RelativeLayout>
