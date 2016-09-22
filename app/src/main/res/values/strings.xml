@@ -3,5 +3,10 @@
     <string name="BLE_not_supported">BLE is not supported</string>
     <string name="scanBLE">Scan BLE</string>
     <string name="position">Position</string>
-    <string name="clrBLEList">Clear BLE List</string>
+    <string name="clrBLEList">Clr BLE List</string>
+    <string name="WiFi">WiFi</string>
+    <string-array name="WiFiSpinner">
+        <item>WiFi Info</item>
+        <item>WLAN Scan</item>
+    </string-array>
 </resources>

@@ -3,11 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.riesenbeck.myblescanner.MainActivity">
+
+    <TextureView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_Camera"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/tBtn_scanBLE" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_BLE"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tBtn_scanBLE"
+        android:layout_toStartOf="@+id/btn_clrBLEList"
+        android:background="#80FFFFFF"
+        android:layout_alignEnd="@+id/btn_clrBLEList" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_WiFiConnectionInfo"
+        android:layout_alignTop="@+id/lv_BLE"
+        android:background="#80FFFFFF"
+        android:layout_toEndOf="@+id/btn_clrBLEList" />
 
     <ToggleButton
         android:layout_width="wrap_content"
@@ -23,22 +44,23 @@
         android:text="@string/clrBLEList"
         android:id="@+id/btn_clrBLEList"
         android:layout_above="@+id/lv_BLE"
-        android:layout_alignParentEnd="true" />
+        android:layout_toEndOf="@+id/tBtn_scanBLE" />
 
-    <TextureView
+    <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_Camera"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"/>
+        android:text="@string/WiFi"
+        android:id="@+id/sw_wifi"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/lv_BLE"
+        android:checked="false" />
 
-    <ListView
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/lv_BLE"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/tBtn_scanBLE"
-        android:layout_toStartOf="@+id/btn_clrBLEList"
-        android:background="#80FFFFFF" />
+        android:id="@+id/sp_wifi"
+        android:layout_alignBottom="@+id/btn_clrBLEList"
+        android:layout_toEndOf="@+id/sw_wifi"
+        android:spinnerMode="dropdown"/>
 
 </RelativeLayout>
