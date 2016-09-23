@@ -109,21 +109,17 @@ public class MainActivity extends AppCompatActivity {
     private BLEDeviceResult bleDeviceResult;
     private BLEResults bleResultsRef;
 
-    private Timer mTimer;
-    private TimerTask mTimerTask;
-
+    /*
     //WiFi
     public static final String TAG = "Basic Network Demo";
-    private List<String> wifiInfoList = new ArrayList<String>();
     private static boolean wifiConnected = false;
     private static boolean mobileConnected = false;
     private static final IntentFilter INTENT_FILTER = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
     private static WifiManager mWifiManager;
     private static WifiReceiver receiverWifi;
-
-
-
+    private List<String> wifiInfoList = new ArrayList<String>();
     private ArrayAdapter<String> adapter;
+    */
 
     //Camera
     private CameraDevice mCameraDevice;
@@ -193,17 +189,8 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initBLE();
-        initWiFi();
+        //initWiFi();
 
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                scanLEDevices(true);
-                mTimer.cancel();
-                mTimer.purge();
-                //tBtnScanBLE.setChecked(false);
-            }
-        };
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
     }
 
@@ -234,8 +221,8 @@ public class MainActivity extends AppCompatActivity {
         paintBLEList();
 
         //WiFi
-        this.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        swWiFi.setChecked((mWifiManager.getWifiState() == mWifiManager.WIFI_STATE_ENABLED));
+        //this.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        //swWiFi.setChecked((mWifiManager.getWifiState() == mWifiManager.WIFI_STATE_ENABLED));
 
         //startCameraThread
         startBackgroundThread();
@@ -250,11 +237,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         //unregister WiFi Listener
-        this.unregisterReceiver(receiverWifi);
+        //this.unregisterReceiver(receiverWifi);
 
         //Camera
         closeCamera();
         stopBackgroundThread();
+
+        tBtnScanBLE.setChecked(false);
 
         super.onPause();
     }
@@ -269,17 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 if(isChecked){
                     btnClrBLEList.setEnabled(false);
                     scanLEDevices(true);
-                    /*
-                    mTimer = new Timer();
-                    mTimer.schedule(mTimerTask, 1000, 1000);
-                    */
                 }else{
-                    /*
-                    if (mTimer != null) {
-                        mTimer.cancel();
-                        mTimer.purge();
-                        mTimer = null;
-                    }*/
                     scanLEDevices(false);
                     btnClrBLEList.setEnabled(true);
                 }
@@ -313,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothAdapter = mBluetoothManager.getAdapter();
     }
 
-    private void initWiFi(){
+    /*private void initWiFi(){
         ArrayAdapter<CharSequence> adapterDropdown = ArrayAdapter.createFromResource(this, R.array.WiFiSpinner, android.R.layout.simple_spinner_item);
         adapterDropdown.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spWiFi.setAdapter(adapterDropdown);
@@ -341,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         });
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         checkNetworkConnection();
-    }
+    }*/
 
     // Starts or Stops BLE Scan
     private void scanLEDevices(boolean start){
@@ -468,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void checkNetworkConnection() {
+    /*public void checkNetworkConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected()) {
@@ -539,5 +518,5 @@ public class MainActivity extends AppCompatActivity {
             }
             Toast.makeText(getApplicationContext(),sb.toString(),Toast.LENGTH_LONG).show();
         }
-    }
+    }*/
 }
