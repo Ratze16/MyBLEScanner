@@ -16,6 +16,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -35,18 +37,15 @@ import android.os.HandlerThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -57,8 +56,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -67,10 +64,8 @@ public class MainActivity extends AppCompatActivity {
     //View
     private ListView lvBLE;
     private ToggleButton tBtnScanBLE;
-    private Button btnClrBLEList;
     private ArrayAdapter<String> arrayAdapter;
     private TextureView mTvCamera;
-    private static Switch swWiFi;
     private static ListView lvWifiConnectionInfo;
     private Spinner spWiFi;
 
@@ -109,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private BLEDeviceResult bleDeviceResult;
     private BLEResults bleResultsRef;
 
-    /*
+
     //WiFi
     public static final String TAG = "Basic Network Demo";
     private static boolean wifiConnected = false;
@@ -119,11 +114,12 @@ public class MainActivity extends AppCompatActivity {
     private static WifiReceiver receiverWifi;
     private List<String> wifiInfoList = new ArrayList<String>();
     private ArrayAdapter<String> adapter;
-    */
+
 
     //Camera
     private CameraDevice mCameraDevice;
-    private Size mImageDimension;
+    private CameraManager mCameraManager;
+    private Size mImageSize;
     private String mCameraID;
     private CameraCaptureSession mCameraCaptureSessions;
     private CaptureRequest.Builder mCaptureRequestBuilder;
@@ -131,18 +127,19 @@ public class MainActivity extends AppCompatActivity {
     private HandlerThread mBackgroundThread;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-    TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener(){
 
+
+    TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener(){
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             //opens the Camera
-            //TODO openCamer(width,height)
-            openCamera();
+            openCamera(width, height);
         }
 
         @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
-            //TODO configureTransform(width,height)
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+            //TODO Comment
+            configureTransform(width, height);
         }
 
         @Override
@@ -189,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initBLE();
-        //initWiFi();
+        initWiFi();
 
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
     }
@@ -221,14 +218,13 @@ public class MainActivity extends AppCompatActivity {
         paintBLEList();
 
         //WiFi
-        //this.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        //swWiFi.setChecked((mWifiManager.getWifiState() == mWifiManager.WIFI_STATE_ENABLED));
+        this.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
         //startCameraThread
         startBackgroundThread();
 
         if (mTvCamera.isAvailable()) {
-            openCamera();
+            openCamera(mTvCamera.getWidth(),mTvCamera.getHeight());
         } else {
             mTvCamera.setSurfaceTextureListener(mSurfaceTextureListener);
         }
@@ -256,26 +252,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    btnClrBLEList.setEnabled(false);
+                    bleResultsRef.clearBLEResults();
                     scanLEDevices(true);
                 }else{
                     scanLEDevices(false);
-                    btnClrBLEList.setEnabled(true);
                 }
-            }
-        });
-        btnClrBLEList = (Button)findViewById(R.id.btn_clrBLEList);
-        btnClrBLEList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bleResultsRef.clearBLEResults();
-                paintBLEList();
             }
         });
 
         lvWifiConnectionInfo = (ListView) findViewById(R.id.lv_WiFiConnectionInfo);
         spWiFi = (Spinner) findViewById(R.id.sp_wifi);
-        swWiFi = (Switch) findViewById(R.id.sw_wifi);
 
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
     }
@@ -292,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothAdapter = mBluetoothManager.getAdapter();
     }
 
-    /*private void initWiFi(){
+    private void initWiFi(){
         ArrayAdapter<CharSequence> adapterDropdown = ArrayAdapter.createFromResource(this, R.array.WiFiSpinner, android.R.layout.simple_spinner_item);
         adapterDropdown.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spWiFi.setAdapter(adapterDropdown);
@@ -300,9 +286,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch(position){
-                    case 0: refreshWiFiInfo();break;
-                    case 1: refreshWiFiScan(mWifiManager.getScanResults());break;
-                    case 2: break;
+                    case 0: //Show nothing
+                        lvWifiConnectionInfo.setVisibility(View.INVISIBLE);
+                        break;
+                    case 1:
+                        lvWifiConnectionInfo.setVisibility(View.VISIBLE);
+                        refreshWiFiScan(mWifiManager.getScanResults());break;
+                    case 2:
+                        lvWifiConnectionInfo.setVisibility(View.VISIBLE);
+                        refreshWiFiInfo();break;
                     default: break;
                 }
             }
@@ -312,15 +304,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        swWiFi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mWifiManager.setWifiEnabled(b);
-            }
-        });
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         checkNetworkConnection();
-    }*/
+    }
 
     // Starts or Stops BLE Scan
     private void scanLEDevices(boolean start){
@@ -351,19 +337,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Opens the Camera
-    private void openCamera(){
-        CameraManager mCameraManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
+    private void openCamera(int width, int height){
+        mCameraManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
             mCameraID = mCameraManager.getCameraIdList()[0];
             CameraCharacteristics cameraCharacteristics = mCameraManager.getCameraCharacteristics(mCameraID);
             StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
-            mImageDimension = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
+            mImageSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
             // Add permission for camera and let user grant the permission
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getParent(), new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
+            configureTransform(width, height);
             mCameraManager.openCamera(mCameraID, mStateCallback, null);
         }catch (CameraAccessException e){
             e.printStackTrace();
@@ -395,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             assert mCameraSurfaceTexture != null;
 
             //Configure Size of Camera Preiview
-            mCameraSurfaceTexture.setDefaultBufferSize(mImageDimension.getWidth(),mImageDimension.getHeight());
+            mCameraSurfaceTexture.setDefaultBufferSize(mImageSize.getWidth(), mImageSize.getHeight());
             //Set Texture to Surface
             Surface surface = new Surface(mCameraSurfaceTexture);
 
@@ -429,6 +416,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void configureTransform(int viewWidth, int viewHeight) {
+        Activity activity = this;
+        if (null == mTvCamera || null == mImageSize || null == activity) {
+            return;
+        }
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        RectF bufferRect = new RectF(0, 0, mTvCamera.getHeight(), mTvCamera.getWidth());
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+            float scale = Math.max(
+                    (float) viewHeight / mTvCamera.getHeight(),
+                    (float) viewWidth / mTvCamera.getWidth());
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180, centerX, centerY);
+        }
+        mTvCamera.setTransform(matrix);
+    }
+
     //Starts the new Thread for the Camera
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
@@ -447,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*public void checkNetworkConnection() {
+    public void checkNetworkConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
         if (activeInfo != null && activeInfo.isConnected()) {
@@ -518,5 +530,5 @@ public class MainActivity extends AppCompatActivity {
             }
             Toast.makeText(getApplicationContext(),sb.toString(),Toast.LENGTH_LONG).show();
         }
-    }*/
+    }
 }

@@ -18,17 +18,16 @@
         android:id="@+id/lv_BLE"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tBtn_scanBLE"
-        android:layout_toStartOf="@+id/btn_clrBLEList"
         android:background="#80FFFFFF"
-        android:layout_alignEnd="@+id/btn_clrBLEList" />
+        android:layout_toStartOf="@+id/lv_WiFiConnectionInfo" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lv_WiFiConnectionInfo"
-        android:layout_alignTop="@+id/lv_BLE"
         android:background="#80FFFFFF"
-        android:layout_toEndOf="@+id/btn_clrBLEList" />
+        android:layout_below="@+id/tBtn_scanBLE"
+        android:layout_alignStart="@+id/sp_wifi" />
 
     <ToggleButton
         android:layout_width="wrap_content"
@@ -38,29 +37,13 @@
         android:layout_alignParentTop="true"
         android:checked="false" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/clrBLEList"
-        android:id="@+id/btn_clrBLEList"
-        android:layout_above="@+id/lv_BLE"
-        android:layout_toEndOf="@+id/tBtn_scanBLE" />
-
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/WiFi"
-        android:id="@+id/sw_wifi"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/lv_BLE"
-        android:checked="false" />
-
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/sp_wifi"
-        android:layout_alignBottom="@+id/btn_clrBLEList"
-        android:layout_toEndOf="@+id/sw_wifi"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dropdown"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/tBtn_scanBLE"
+        android:layout_marginStart="80dp" />
 
 </RelativeLayout>

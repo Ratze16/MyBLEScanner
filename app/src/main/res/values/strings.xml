@@ -5,8 +5,13 @@
     <string name="position">Position</string>
     <string name="clrBLEList">Clr BLE List</string>
     <string name="WiFi">WiFi</string>
+    <string-array name="BLESpinner">
+        <item>Nothing</item>
+        <item>BLE Scan</item>
+    </string-array>
     <string-array name="WiFiSpinner">
-        <item>WiFi Info</item>
-        <item>WLAN Scan</item>
+        <item>Ausgeblendet</item>
+        <item>WiFi Scan</item>
+        <item>Wifi Connection</item>
     </string-array>
 </resources>
