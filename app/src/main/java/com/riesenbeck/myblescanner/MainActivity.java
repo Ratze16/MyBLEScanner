@@ -43,6 +43,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private TextureView mTvCamera;
     private static ListView lvWifiConnectionInfo;
     private Spinner spWiFi;
+    private Button mBtnLPDLTest;
 
     //BLE Scan
     private BluetoothManager mBluetoothManager;
@@ -262,6 +264,13 @@ public class MainActivity extends AppCompatActivity {
 
         lvWifiConnectionInfo = (ListView) findViewById(R.id.lv_WiFiConnectionInfo);
         spWiFi = (Spinner) findViewById(R.id.sp_wifi);
+        mBtnLPDLTest = (Button) findViewById(R.id.btnLPDLTest);
+        mBtnLPDLTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), LDPL.class));
+            }
+        });
 
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
     }

@@ -5,13 +5,28 @@
     <string name="position">Position</string>
     <string name="clrBLEList">Clr BLE List</string>
     <string name="WiFi">WiFi</string>
-    <string-array name="BLESpinner">
-        <item>Nothing</item>
-        <item>BLE Scan</item>
-    </string-array>
+    <string name="LPDLTest">LPDL Test</string>
+    <string name="LDPLTestInfo">Es werden eine Reihe von Messungen durchgeführt. Diese Messung dauert ca. 4 Minuten. Bitte folgen Sie den Anweisungen</string>
+    <string name="LPDLTestInstruction">Anweisungen</string>
+
+    <string name="Next">Weiter</string>
+    <string name="Measurement">Messung</string>
+    <string name="TotalProgress">Gesamtfortschritt</string>
     <string-array name="WiFiSpinner">
         <item>Ausgeblendet</item>
         <item>WiFi Scan</item>
         <item>Wifi Connection</item>
+    </string-array>
+    <string-array name="LDPLTest">
+        <item>Legen Sie das Handy genau auf den BLE Transmitter, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 10cm vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 50cm vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 1m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 2m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 3m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 4m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 6m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 8m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
+        <item>Halten sie das Handy 10m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
     </string-array>
 </resources>
