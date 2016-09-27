@@ -1,7 +1,10 @@
 package com.riesenbeck.myblescanner;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
@@ -14,6 +17,7 @@ public class BLEResultActivity extends AppCompatActivity {
     private BLEResults bleResultsRef = null;
     private BLEDeviceResult bleResult = null;
     private StringBuilder stringBuilder = new StringBuilder();
+    private Button mBtnLPDLTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +33,7 @@ public class BLEResultActivity extends AppCompatActivity {
         tvDeviceInfo = (TextView)findViewById(R.id.tv_DeviceInfo);
 
 
-        int position = getIntent().getIntExtra(getString(R.string.position),-1);
+        final int position = getIntent().getIntExtra(getString(R.string.position),-1);
         if(position!=-1){
             bleResult = bleResultsRef.getBleDeviceResult(position);
 
@@ -50,6 +54,15 @@ public class BLEResultActivity extends AppCompatActivity {
         }else{
             //output Errormessage
         }
+        mBtnLPDLTest = (Button) findViewById(R.id.btnLPDLTest);
+        mBtnLPDLTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LDPL_Test.class);
+                intent.putExtra(getString(R.string.position), position);
+                startActivity(intent);
+            }
+        });
 
     }
 }
