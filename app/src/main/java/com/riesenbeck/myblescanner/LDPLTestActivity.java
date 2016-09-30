@@ -22,7 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
+import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
 import com.riesenbeck.myblescanner.Data.LDPLResults;
 
@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class LDPL_Test extends AppCompatActivity {
+public class LDPLTestActivity extends AppCompatActivity {
 
-    private static BLEDeviceResult[] LDPLMeasurementResults;
+    private static BleDevice[] LDPLMeasurementResults;
     private final int MEASUREMENTS = 10;
     private final int DISTANCES = 10;
     private Handler mHandler;
-    private final int SCAN_PERIOD = 2000;
+    private final int SCAN_PERIOD = 1000;
     private BLEResults bleResultsRef;
     private LDPLResults LDPLResultsRef;
 
@@ -45,10 +45,10 @@ public class LDPL_Test extends AppCompatActivity {
     private int mPBLDPLTestStatus = 0, mPBLDPLMeasurementStatus = 0;
     private Button mBtnNext, mBtnCancel, mBtnLDPLResults;
     private TextView mTvLDPLMeasurement;
-    private TextView mBleDevice;
+    private TextView mTvBleDevice, mTvRSSI;
 
     //BLE Scan
-    private BLEDeviceResult mBleDeviceResult;
+    private BleDevice mBleDevice;
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
@@ -59,9 +59,10 @@ public class LDPL_Test extends AppCompatActivity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             try {
-                BLEDeviceResult bleDeviceResult = new BLEDeviceResult(device, rssi,scanRecord,System.nanoTime());
-                if(device.getAddress().equals(bleDeviceResult.getBluetoothDevice().getAddress())){
-                    LDPLMeasurementResults[mPBLDPLMeasurementStatus] = bleDeviceResult;
+                BleDevice bleDevice = new BleDevice(device, rssi,scanRecord,System.nanoTime());
+                if(device.getAddress().equals(bleDevice.getmAddress())){
+                    mTvRSSI.setText(String.valueOf(rssi));
+                    LDPLMeasurementResults[mPBLDPLMeasurementStatus] = bleDevice;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -75,9 +76,11 @@ public class LDPL_Test extends AppCompatActivity {
             super.onScanResult(callbackType, result);
 
             try {
-                BLEDeviceResult bleDeviceResult = new BLEDeviceResult(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
-                if(result.getDevice().getAddress().equals(bleDeviceResult.getBluetoothDevice().getAddress())){
-                    LDPLMeasurementResults[mPBLDPLMeasurementStatus] = bleDeviceResult;
+                BleDevice bleDevice = new BleDevice(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
+                if(result.getDevice().getAddress().equals(bleDevice.getmAddress())){
+                    mTvRSSI.setText(String.valueOf(result.getRssi()));
+                    LDPLMeasurementResults[mPBLDPLMeasurementStatus] = bleDevice;
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,11 +93,12 @@ public class LDPL_Test extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ldpl_test);
 
-        LDPLMeasurementResults = new BLEDeviceResult[MEASUREMENTS];
+        LDPLMeasurementResults = new BleDevice[MEASUREMENTS];
         initBLE();
 
         mTvLDPLMeasurement = (TextView)findViewById(R.id.tVLDPLMeasurement);
         mTvLDPLMeasurement.setText(getResources().getStringArray(R.array.LDPLTest)[mPBLDPLTestStatus]);
+        mTvRSSI = (TextView)findViewById(R.id.tv_RSSI_LDPLTest);
         mPBLDPLTest = (ProgressBar)findViewById(R.id.pBLDPLScan);
         mPBLDPLMeasurement = (ProgressBar)findViewById(R.id.pBMeasurement);
         mPBLDPLTest.setProgress(mPBLDPLTestStatus);
@@ -104,6 +108,7 @@ public class LDPL_Test extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mBtnNext.setEnabled(false);
+                mBtnLDPLResults.setEnabled(false);
                 scanLEDevices(true);
                 mPBLDPLTestStatus++;
                 mPBLDPLTest.setProgress(mPBLDPLTestStatus);
@@ -122,16 +127,16 @@ public class LDPL_Test extends AppCompatActivity {
         mBtnLDPLResults.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),LDPL_Results.class);
+                Intent intent = new Intent(getApplicationContext(),LDPLResultsActivity.class);
                 startActivity(intent);
             }
         });
         mHandler = new Handler();
         bleResultsRef = BLEResults.getInstance();
         LDPLResultsRef = LDPLResults.getInstance();
-        mBleDeviceResult = bleResultsRef.getBleDeviceResult(getIntent().getIntExtra(getString(R.string.position),-1));
-        mBleDevice = (TextView)findViewById(R.id.tv_BleDevice);
-        mBleDevice.setText(mBleDeviceResult.getBluetoothDevice().getAddress());
+        mBleDevice = bleResultsRef.getBleDeviceResult(getIntent().getIntExtra(getString(R.string.position),-1));
+        mTvBleDevice = (TextView)findViewById(R.id.tv_BleDevice);
+        mTvBleDevice.setText(mBleDevice.getmAddress());
     }
 
     @Override
@@ -170,6 +175,7 @@ public class LDPL_Test extends AppCompatActivity {
                             mBluetoothAdapter.stopLeScan(mLeScanCallback);
                             if(mPBLDPLMeasurementStatus ==MEASUREMENTS-1){
                                 LDPLResultsRef.addLDPLMeasurementResult(LDPLMeasurementResults);
+                                mBtnLDPLResults.setEnabled(true);
                                 mBtnNext.setEnabled(true);
                             }
                             if(mPBLDPLMeasurementStatus <MEASUREMENTS-1){
@@ -187,6 +193,7 @@ public class LDPL_Test extends AppCompatActivity {
                                 if(mPBLDPLMeasurementStatus ==MEASUREMENTS-1){
                                     LDPLResultsRef.addLDPLMeasurementResult(LDPLMeasurementResults);
                                     mBtnNext.setEnabled(true);
+                                    mBtnLDPLResults.setEnabled(true);
                                 }
                                 if(mPBLDPLMeasurementStatus < MEASUREMENTS-1){
                                     mPBLDPLMeasurementStatus++;
@@ -207,7 +214,12 @@ public class LDPL_Test extends AppCompatActivity {
                 if(Build.VERSION.SDK_INT<21){
                     mBluetoothAdapter.startLeScan(mLeScanCallback);
                 }else{
-                    mBluetoothLeScanner.startScan(scanFilters,scanSettings, mScanCallback);
+                    try {
+                        mBluetoothLeScanner.startScan(scanFilters,scanSettings, mScanCallback);
+                    } catch (IllegalStateException e) {
+                        Toast.makeText(getApplicationContext(),getApplicationContext().getResources().getString(R.string.errorcode0x0011),Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

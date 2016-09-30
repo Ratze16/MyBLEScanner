@@ -6,17 +6,17 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
+import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.LDPLResults;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class LDPL_Results extends AppCompatActivity {
+public class LDPLResultsActivity extends AppCompatActivity {
     private  TableLayout mTlLDPLResults;
     private LDPLResults ldplResultsRef;
-    private List<BLEDeviceResult[]> mLDPLResults;
+    private List<BleDevice[]> mLDPLResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,20 +24,28 @@ public class LDPL_Results extends AppCompatActivity {
         setContentView(R.layout.activity_ldpl__results);
 
         ldplResultsRef = LDPLResults.getInstance();
-        mLDPLResults = new ArrayList<BLEDeviceResult[]>(ldplResultsRef.getBleDeviceResults());
+        mLDPLResults = new ArrayList<BleDevice[]>(ldplResultsRef.getBleDeviceResults());
 
         mTlLDPLResults = (TableLayout)findViewById(R.id.tl_LDPLResults);
+    }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
         for (int i = 0 ; i < mLDPLResults.size() ; i++){
             TableRow row= new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
-            for(int j=0; j< mLDPLResults.get(i).length;j++){
+            BleDevice bleDevice[] = mLDPLResults.get(i);
+            for(int j=0; j< mLDPLResults.get(i).length-1;j++){
                 TextView textView = new TextView(this);
-                textView.setText((mLDPLResults.get(i)[j]).getRssi());
-                row.addView(textView);
+                String s = "K.A.";
+                BleDevice bleDevice1 = bleDevice[j];
+                if(bleDevice1 !=null) s =String.valueOf(bleDevice1.getmRssi());
+                textView.setText(s);
+                row.addView(textView,j);
             }
-            mTlLDPLResults.addView(row);
+            mTlLDPLResults.addView(row,i);
         }
     }
 }

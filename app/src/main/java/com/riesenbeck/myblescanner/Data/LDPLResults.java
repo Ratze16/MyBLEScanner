@@ -8,9 +8,9 @@ import java.util.List;
  */
 public class LDPLResults {
     private static LDPLResults ldplResultsRef = null;
-    private List<BLEDeviceResult[]> ldplResults = null;
+    private List<BleDevice[]> ldplResults = null;
     private LDPLResults(){
-        ldplResults = new ArrayList<BLEDeviceResult[]>();
+        ldplResults = new ArrayList<BleDevice[]>();
     }
     public static LDPLResults getInstance(){
         if (ldplResultsRef==null){
@@ -18,13 +18,13 @@ public class LDPLResults {
         }
         return ldplResultsRef;
     }
-    public void addLDPLMeasurementResult(BLEDeviceResult[] LDPLMeasurementResults){
+    public void addLDPLMeasurementResult(BleDevice[] LDPLMeasurementResults){
         ldplResults.add(LDPLMeasurementResults);
     }
-    public BLEDeviceResult[] getBleDeviceResult(int i){
+    public BleDevice[] getBleDeviceResult(int i){
         return ldplResults.get(i);
     }
-    public List<BLEDeviceResult[]> getBleDeviceResults(){
+    public List<BleDevice[]> getBleDeviceResults(){
         return ldplResults;
     }
     public void clearBLEResults(){

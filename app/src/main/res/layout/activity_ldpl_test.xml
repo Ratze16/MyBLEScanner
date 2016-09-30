@@ -7,7 +7,32 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LDPL_Test">
+    tools:context=".LDPLTestActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/BleDevice"
+        android:id="@+id/textView4"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_BleDevice"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView4" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_RSSI_LDPLTest"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/tv_BleDevice"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -33,18 +58,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/LPDLTestInstruction"
-        android:id="@+id/textView3"
-        android:layout_centerVertical="true"
+        android:text="@string/TotalProgress"
+        android:id="@+id/textView5"
+        android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/tVLDPLMeasurement"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentEnd="true" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
@@ -58,22 +75,23 @@
         android:layout_alignParentStart="true"
         android:layout_alignEnd="@+id/tVLDPLMeasurement" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Next"
-        android:id="@+id/btnNextMeasurement"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/textView" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/TotalProgress"
-        android:id="@+id/textView5"
-        android:layout_below="@+id/textView2"
+        android:text="@string/LPDLTestInstruction"
+        android:id="@+id/textView3"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/tVLDPLMeasurement"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/btnCancel" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -96,22 +114,13 @@
         android:max="10"
         android:progress="0" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/BleDevice"
-        android:id="@+id/textView4"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/tv_BleDevice"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/textView5" />
+        android:text="@string/Next"
+        android:id="@+id/btnNextMeasurement"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/textView" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
