@@ -22,7 +22,7 @@ public class BLEDeviceResult{
         this.rssi = rssi;
         this.scanRecord = scanRecord;
         this.timestampNanos = timestampNanos;
-        this.distance = 0.42093*Math.pow(rssi*1.0/-60,6.9476)+0.54992;
+        this.distance = 0.42093*Math.pow(rssi*1.0/-50,6.9476)+0.54992;
     }
     @Override
     public String toString(){
