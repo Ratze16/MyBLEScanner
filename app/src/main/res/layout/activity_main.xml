@@ -46,12 +46,4 @@
         android:layout_toEndOf="@+id/tBtn_scanBLE"
         android:layout_marginStart="80dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test"
-        android:id="@+id/btnLPDLTest"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/lv_WiFiConnectionInfo" />
-
 </RelativeLayout>

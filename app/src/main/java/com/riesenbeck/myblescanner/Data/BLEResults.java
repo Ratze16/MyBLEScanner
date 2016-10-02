@@ -8,9 +8,9 @@ import java.util.List;
  */
 public class BLEResults {
     private static BLEResults bleResultsRef = null;
-    private List<BLEDeviceResult> bleDeviceResults = null;
+    private List<BleDevice> bleDevices = new ArrayList<BleDevice>();
     private BLEResults(){
-        bleDeviceResults = new ArrayList<BLEDeviceResult>();
+        //bleDevices = new ArrayList<BleDevice>();
     }
     public static BLEResults getInstance(){
         if (bleResultsRef==null){
@@ -18,16 +18,18 @@ public class BLEResults {
         }
         return bleResultsRef;
     }
-    public void addBLEResult(BLEDeviceResult bleDeviceResult){
-        bleDeviceResults.add(bleDeviceResult);
+    public void addBLEResult(BleDevice bleDevice){
+        bleDevices.add(bleDevice);
     }
-    public BLEDeviceResult getBleDeviceResult(int i){
-        return bleDeviceResults.get(i);
+    public BleDevice getBleDeviceResult(int i){
+        return bleDevices.get(i);
     }
-    public List<BLEDeviceResult> getBleDeviceResults(){
-        return bleDeviceResults;
+    public List<BleDevice> getBleDevices(){
+        return bleDevices;
     }
     public void clearBLEResults(){
-        bleDeviceResults.clear();
+        bleDevices.clear();
     }
+
+
 }

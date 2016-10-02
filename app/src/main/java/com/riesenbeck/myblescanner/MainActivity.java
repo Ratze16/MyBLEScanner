@@ -43,14 +43,13 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
+import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
 
 import java.util.ArrayList;
@@ -69,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private TextureView mTvCamera;
     private static ListView lvWifiConnectionInfo;
     private Spinner spWiFi;
-    private Button mBtnLPDLTest;
 
     //BLE Scan
     private BluetoothManager mBluetoothManager;
@@ -82,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             try {
-                bleResultsRef.addBLEResult(new BLEDeviceResult(device, rssi,scanRecord,System.nanoTime()));
+                bleResultsRef.addBLEResult(new BleDevice(device, rssi,scanRecord,System.nanoTime()));
                 paintBLEList();
 
             } catch (Exception e) {
@@ -95,17 +93,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            bleDeviceResult = new BLEDeviceResult(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
-            bleResultsRef.addBLEResult(bleDeviceResult);
+            bleDevice = new BleDevice(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
+            bleResultsRef.addBLEResult(bleDevice);
             paintBLEList();
         }
     };
 
-
     //BLE Data
-    private BLEDeviceResult bleDeviceResult;
+    private BleDevice bleDevice;
     private BLEResults bleResultsRef;
-
 
     //WiFi
     public static final String TAG = "Basic Network Demo";
@@ -129,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     private HandlerThread mBackgroundThread;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-
 
     TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener(){
         @Override
@@ -217,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        paintBLEList();
+        //paintBLEList();
 
         //WiFi
         this.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -264,13 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
         lvWifiConnectionInfo = (ListView) findViewById(R.id.lv_WiFiConnectionInfo);
         spWiFi = (Spinner) findViewById(R.id.sp_wifi);
-        mBtnLPDLTest = (Button) findViewById(R.id.btnLPDLTest);
-        mBtnLPDLTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), LDPL.class));
-            }
-        });
+
 
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
     }
@@ -338,8 +327,9 @@ public class MainActivity extends AppCompatActivity {
     //Redraw the BLE List
     private void paintBLEList(){
         List<String> bleDeviceStringList = new ArrayList<String>();
-        for(BLEDeviceResult bleDeviceResult: bleResultsRef.getBleDeviceResults()){
-            bleDeviceStringList.add(bleDeviceResult.toString());
+        List<BleDevice> bleDeviceList = bleResultsRef.getBleDevices();
+        for(BleDevice bleDevice : bleResultsRef.getBleDevices()){
+            bleDeviceStringList.add(bleDevice.toString());
         }
         arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, bleDeviceStringList);
         lvBLE.setAdapter(arrayAdapter);

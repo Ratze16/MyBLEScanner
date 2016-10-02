@@ -30,7 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".BLEResultActivity" />
-        <activity android:name=".LDPL"></activity>
+        <activity android:name=".LDPLTestActivity" />
+        <activity android:name=".LDPLResultsActivity"></activity>
     </application>
 
 </manifest>

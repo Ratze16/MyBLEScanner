@@ -1,10 +1,13 @@
 package com.riesenbeck.myblescanner;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.riesenbeck.myblescanner.Data.BLEDeviceResult;
+import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
 
 public class BLEResultActivity extends AppCompatActivity {
@@ -12,8 +15,9 @@ public class BLEResultActivity extends AppCompatActivity {
     private TextView tvDevice;
     private TextView tvDeviceInfo;
     private BLEResults bleResultsRef = null;
-    private BLEDeviceResult bleResult = null;
+    private BleDevice bleResult = null;
     private StringBuilder stringBuilder = new StringBuilder();
+    private Button mBtnLPDLTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,27 +33,39 @@ public class BLEResultActivity extends AppCompatActivity {
         tvDeviceInfo = (TextView)findViewById(R.id.tv_DeviceInfo);
 
 
-        int position = getIntent().getIntExtra(getString(R.string.position),-1);
+        final int position = getIntent().getIntExtra(getString(R.string.position),-1);
         if(position!=-1){
             bleResult = bleResultsRef.getBleDeviceResult(position);
+            byte[] bytes = bleResult.getmScanRecord();
 
             try {
-                stringBuilder.append(bleResult.getBluetoothDevice().getAddress()+"\n");
-                stringBuilder.append(bleResult.getBluetoothDevice().getBluetoothClass().toString()+"\n");
-                stringBuilder.append(bleResult.getBluetoothDevice().getBondState()+"\n");
-                stringBuilder.append(bleResult.getBluetoothDevice().getName()+"\n");
-                stringBuilder.append(bleResult.getBluetoothDevice().getType()+"\n");
-                //stringBuilder.append(bleResult.getBluetoothDevice().getUuids().toString()+"\n");
-                stringBuilder.append(bleResult.getRssi()+"\n");
-                stringBuilder.append(bleResult.getScanRecord()+"\n");
+                stringBuilder.append("Adress:\t"+bleResult.getmAddress()+"\n");
+                stringBuilder.append("BluetoothClass:\t"+bleResult.getmBluetoothDevice().getBluetoothClass().toString()+"\n");
+                stringBuilder.append("Bondstate:\t"+bleResult.getmBondState()+"\n");
+                stringBuilder.append("Name:\t"+bleResult.getmName()+"\n");
+                stringBuilder.append("Type:\t"+bleResult.getmType()+"\n");
+                //stringBuilder.append("UUIDs:\t"+bleResult.getBluetoothDevice().getUuids().toString()+"\n");
+                stringBuilder.append("RSSI:\t"+bleResult.getmRssi()+"\n\n");
+                stringBuilder.append("ScanRecord:\n\t[Byte][Hex][Zweierkomplement]\n");
+                for(int i = 0; i<bytes.length;i++){
+                    stringBuilder.append("\t["+i+"]["+Integer.toHexString(bytes[i])+"]["+ bytes[i]+"]\n");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            tvDevice.setText(bleResult.getBluetoothDevice().getName());
+            tvDevice.setText(bleResult.getmBluetoothDevice().getName());
             tvDeviceInfo.setText(stringBuilder.toString());
         }else{
             //output Errormessage
         }
-
+        mBtnLPDLTest = (Button) findViewById(R.id.btnLPDLTest);
+        mBtnLPDLTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LDPLTestActivity.class);
+                intent.putExtra(getString(R.string.position), position);
+                startActivity(intent);
+            }
+        });
     }
 }
