@@ -44,7 +44,7 @@ public class BLEResultActivity extends AppCompatActivity {
                 stringBuilder.append("Bondstate:\t"+bleResult.getmBondState()+"\n");
                 stringBuilder.append("Name:\t"+bleResult.getmName()+"\n");
                 stringBuilder.append("Type:\t"+bleResult.getmType()+"\n");
-                stringBuilder.append("UUIDs:\t"+bleResult.getmUuids().toString()+"\n");
+                //stringBuilder.append("UUIDs:\t"+bleResult.getmUuids().toString()+"\n");
                 stringBuilder.append("RSSI:\t"+bleResult.getmRssi()+"\n\n");
                 stringBuilder.append("ScanRecord:\n\t[Byte][Hex][Zweierkomplement]\n");
                 for(int i = 0; i<bytes.length;i++){

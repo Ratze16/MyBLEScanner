@@ -32,7 +32,7 @@ public class BleDevice {
     }
     @Override
     public String toString(){
-        return "Device: "+mBluetoothDevice.toString()+ "\nRSSI: "+String.valueOf(mRssi)+"\nTimestamp: "+mTimestampNanos+"\nDistance: KA";
+        return "Device: "+mBluetoothDevice.toString()+ "\nRSSI: "+String.valueOf(mRssi)+"\nTimestamp: "+mTimestampNanos+"\nDistance: "+Room.getInstance().getKlQuadrateDistance(mRssi,-65)+"\nDistance Exp: "+Room.getInstance().getExponential(mRssi,-65);
     }
 
     public BluetoothDevice getmBluetoothDevice() {

@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
     private List<String> wifiInfoList = new ArrayList<String>();
     private ArrayAdapter<String> adapter;
 
-
     //Camera
     private CameraDevice mCameraDevice;
     private CameraManager mCameraManager;
