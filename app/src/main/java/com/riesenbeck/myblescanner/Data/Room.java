@@ -22,12 +22,12 @@ public class Room {
         }
         return mRoomReference;
     }
-    public double getKlQuadrateDistance(int rssi, int txPower){
+    public double getKlQuadrateDistance(double rssi, int txPower){
         double d = q[2]*Math.pow((1.0*rssi)/txPower,q[1])+q[0];
         return d;
     }
-    public double getExponential(int rssi, int txPower){
-        double d = 0.00867745*Math.pow(Math.E,4.76147*((1.0*rssi)/txPower));
+    public double getExponential(double rssi, int txPower){
+        double d = 0.00867745*Math.pow(Math.E,(4.76147*((1.0*rssi)/txPower)));
         return d;
     }
 }

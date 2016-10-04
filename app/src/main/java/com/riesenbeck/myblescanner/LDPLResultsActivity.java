@@ -1,5 +1,6 @@
 package com.riesenbeck.myblescanner;
 
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ public class LDPLResultsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exportCSV();
+                startActivity(new Intent(getApplicationContext(),RoomActivity.class));
             }
         });
     }

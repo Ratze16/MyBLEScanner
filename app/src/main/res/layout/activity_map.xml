@@ -17,20 +17,12 @@
         android:text="@string/dummy_content"
         android:textColor="#33b5e5"
         android:textSize="50sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:background="@drawable/room103"
+        />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
 
-        <SurfaceView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/sV_Map" />
-
-    </FrameLayout>
 
 </FrameLayout>
