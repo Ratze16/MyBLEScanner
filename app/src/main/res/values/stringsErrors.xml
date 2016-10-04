@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="errorcode0x0011">Bluetooth Scan konnte nicht gestartet werden. Errorcode: 0x0011</string>
+</resources>

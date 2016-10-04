@@ -15,6 +15,7 @@
     <string name="BleDevice">BLE Device</string>
     <string name="Cancel">Abbrechen</string>
     <string name="LPDLResults">LDPL Results</string>
+    <string name="ExportCSV">Export to CSV</string>
     <string-array name="WiFiSpinner">
         <item>Ausgeblendet</item>
         <item>WiFi Scan</item>
@@ -33,15 +34,15 @@
         <item>Halten sie das Handy 10m vom Transmitter entfernt, klicken Sie auf Weiter und warten Sie bis der Scanvorgang abgeschlossen ist.</item>
     </string-array>
     <string-array name="LPDLResults">
-        <item>0,0</item>
-        <item>0,1</item>
-        <item>0,5</item>
-        <item>1,0</item>
-        <item>2,0</item>
-        <item>3,0</item>
-        <item>4,0</item>
-        <item>6,0</item>
-        <item>8,0</item>
-        <item>10,0</item>
+        <item>0.0</item>
+        <item>0.1</item>
+        <item>0.5</item>
+        <item>1.0</item>
+        <item>2.0</item>
+        <item>3.0</item>
+        <item>4.0</item>
+        <item>6.0</item>
+        <item>8.0</item>
+        <item>10.0</item>
     </string-array>
 </resources>
