@@ -17,7 +17,7 @@ public class BLEResultActivity extends AppCompatActivity {
     private BLEResults bleResultsRef = null;
     private BleDevice bleResult = null;
     private StringBuilder stringBuilder = new StringBuilder();
-    private Button mBtnLPDLTest;
+    private Button mBtnLPDLTest, mBtnRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,14 @@ public class BLEResultActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), LDPLTestActivity.class);
                 intent.putExtra(getString(R.string.position), position);
+                startActivity(intent);
+            }
+        });
+        mBtnRoom = (Button) findViewById(R.id.btnRoom);
+        mBtnRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RoomActivity.class);
                 startActivity(intent);
             }
         });

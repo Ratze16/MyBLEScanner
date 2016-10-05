@@ -10,7 +10,7 @@
     tools:context=".BLEResultActivity">
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/LPDLTest"
         android:id="@+id/btnLPDLTest"
@@ -47,5 +47,13 @@
 
         </RelativeLayout>
     </ScrollView>
+
+    <Button
+        android:text="@string/ShowRoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

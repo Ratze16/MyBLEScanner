@@ -13,6 +13,7 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,10 +31,12 @@ import android.widget.Toast;
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.Room;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class RoomActivity extends AppCompatActivity {
+    private static int BEACON_X = 0, BEACON_Y = 0;
     private final int MEASUREMENTS = 10;
     private int mPosSearchStatus = 0;
     private int[] mRssiList;
@@ -117,10 +121,40 @@ public class RoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room);
         initBLE();
         pbPosSearch = (ProgressBar)findViewById(R.id.pB_posSearch);
+        pbPosSearch.setMax(MEASUREMENTS);
         mRssiList = new int[MEASUREMENTS];
-        scanBle();
+
         mIvCircle = (ImageView)findViewById(R.id.iV_Circle);
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()){
+            if(Build.VERSION.SDK_INT >=21){
+                mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+                scanFilters = new ArrayList<ScanFilter>();
+                scanSettings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+            }
+        }else{
+            startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
+        }
+        scanBle();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        BEACON_X = (int)event.getX()-50;
+        BEACON_Y = (int)event.getY()-160;
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN: drawCircle(mDistance); break;
+            case MotionEvent.ACTION_MOVE: break;
+            case MotionEvent.ACTION_UP:  break;
+        }
+        return false;
+    }
+
 
     private void initBLE(){
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)){
@@ -147,12 +181,14 @@ public class RoomActivity extends AppCompatActivity {
     private void drawCircle(double r){
         Paint paint = new Paint();
         paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(125);
+
 
         Bitmap bmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(bmp);
-        canvas.drawCircle(bmp.getWidth()/2,bmp.getHeight()/2 , (float) r, paint);
+        canvas.drawCircle(BEACON_X,BEACON_Y , (float) r*mIvCircle.getWidth()/11, paint);
 
         mIvCircle.setImageBitmap(bmp);
     }

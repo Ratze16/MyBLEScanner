@@ -40,7 +40,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_map"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".RoomActivity"></activity>
+        <activity android:name=".RoomActivity" android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

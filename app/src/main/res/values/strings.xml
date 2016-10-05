@@ -53,4 +53,5 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>+
 
     <string name="searchingPosition">Bitte warten Sie ca. 20 Sekunden, die aktuelle Position wird ermittelt.</string>
+    <string name="ShowRoom">Zeige Raum</string>
 </resources>
