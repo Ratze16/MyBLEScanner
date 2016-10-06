@@ -21,6 +21,25 @@
         android:background="@drawable/room103"
         />
 
+    <Button
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:id="@+id/btn_refreshTrilateration"
+        android:text="@string/Refresh" />
+
+    <ScrollView
+        android:layout_width="193dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/tl_Trilateration" />
+    </ScrollView>
+
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
