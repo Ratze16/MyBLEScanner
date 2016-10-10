@@ -18,18 +18,30 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.inputmethodservice.Keyboard;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.Room;
+import com.riesenbeck.myblescanner.Data.Trilateration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +52,9 @@ public class RoomActivity extends AppCompatActivity {
     private final int MEASUREMENTS = 10;
     private int mPosSearchStatus = 0;
     private int[] mRssiList;
-    private double mRssiMean = 0, mDistance = 0;
+    private double mDistance = 0;
+    private double mRssiMean = 0;
+    private int mRssiMax = 0, mRssiMin = -200;
 
     //BLE Scan
     private BleDevice mBleDevice;
@@ -53,6 +67,70 @@ public class RoomActivity extends AppCompatActivity {
     private ProgressBar pbPosSearch;
     private ImageView mIvCircle;
 
+    private Button mBtnCalcPosition;
+    private ToggleButton mtBtnRefreshBeacons;
+    private TableLayout mTlBeacons;
+
+    private String mBleDeviceSearchAddress;
+    private double[][] posEmp = new double[3][2];
+    private double[] radius = new double[3];
+    private int numEmp = 0;
+    private double[] posXY = new double[2];
+
+    private Bitmap mBmp;
+    private Canvas mCanvas = new Canvas();;
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(v==mBtnCalcPosition){
+                double[] result = Trilateration.getInstance().dist2Pos(posEmp,radius,numEmp,posXY);
+                BEACON_X = (int)(result[0]/11.3*879);
+                BEACON_Y = (int)(result[1]/11.3*879);
+                mBmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
+                mCanvas.setBitmap(mBmp);
+                drawCircle(0.1);
+                drawCircle(result[2]);
+            }else{
+                mTextviewSelected = (TextView) v;
+
+                TableLayout tl = ((TableLayout)mTextviewSelected.getParent().getParent());
+                for (int i = 0 ; i<tl.getChildCount();i++){
+                    ((TextView)((TableRow)tl.getChildAt(i)).getChildAt(0)).setClickable(false);
+                }
+                Toast.makeText(getApplicationContext(),"Beaconposition wählen",Toast.LENGTH_SHORT).show();
+                mIvCircle.setOnTouchListener(mOnTouchListener);
+            }
+        }
+    };
+
+    private ImageView.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            scanBle(false);
+            BEACON_X = (int)event.getX();
+            BEACON_Y = (int)event.getY();
+            mBleDeviceSearchAddress = String.valueOf(mTextviewSelected.getText());
+            mBeaconsSelected++;
+            mTextviewSelected.setBackgroundColor(Color.RED);
+            drawCircle(0.1);
+            mIvCircle.setOnTouchListener(null);
+
+            mTextviewSelected.setSelected(true);
+
+            //Init Searchdata
+            mDistance = 0;
+            mPosSearchStatus = 0;
+            mRssiList = new int[MEASUREMENTS];
+            mRssiMean = 0;
+            mRssiMax = 0;
+            mRssiMin = -200;
+
+            scanBle(true);
+            return false;
+        }
+    };
+
     //BLECallback for API Version <21
     private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback(){
         @Override
@@ -60,14 +138,14 @@ public class RoomActivity extends AppCompatActivity {
             try {
                 BleDevice bleDevice = new BleDevice(device, rssi,scanRecord,System.nanoTime());
                 if(device.getAddress().equals(bleDevice.getmAddress())){
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    scanBle(false);
 
                     try {
                         if(mPosSearchStatus < MEASUREMENTS){
                             mRssiList[mPosSearchStatus] = bleDevice.getmRssi();
                             mPosSearchStatus++;
                             pbPosSearch.setProgress(mPosSearchStatus);
-                            scanBle();
+                            scanBle(true);
                         }else{
                             //Calc Position
                         }
@@ -86,34 +164,62 @@ public class RoomActivity extends AppCompatActivity {
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
 
-            try {
-                BleDevice bleDevice = new BleDevice(result.getDevice(), result.getRssi(),result.getScanRecord().getBytes(), result.getTimestampNanos());
-                if(result.getDevice().getAddress().equals(bleDevice.getmAddress())){
-                    mBluetoothLeScanner.stopScan(mScanCallback);
+            if(mtBtnRefreshBeacons.isChecked()==true){
+                //Todo Create Table
+                addTableRow(result.getDevice().getAddress());
+            }
+            else {
+                try {
+                    BleDevice bleDevice = new BleDevice(result.getDevice(), result.getRssi(), result.getScanRecord().getBytes(), result.getTimestampNanos());
+                    if (result.getDevice().getAddress().equals(mBleDeviceSearchAddress)) {
+                        scanBle(false);
 
-                    try {
-                        if(mPosSearchStatus < MEASUREMENTS){
-                            mRssiList[mPosSearchStatus] = bleDevice.getmRssi();
-                            mPosSearchStatus++;
-                            pbPosSearch.setProgress(mPosSearchStatus);
-                            scanBle();
-                        }else{
-                            for(int rssi: mRssiList){
-                                mRssiMean = mRssiMean + rssi;
+                        try {
+                            if (mPosSearchStatus < MEASUREMENTS) {
+                                mRssiList[mPosSearchStatus] = bleDevice.getmRssi();
+                                mPosSearchStatus++;
+                                pbPosSearch.setProgress(mPosSearchStatus);
+                                scanBle(true);
+                            } else {
+                                for (int rssi : mRssiList) {
+                                    if(rssi < mRssiMax) mRssiMax=rssi;
+                                    if(rssi > mRssiMin) mRssiMin=rssi;
+                                    mRssiMean = mRssiMean + rssi;
+                                }
+
+                                mRssiMean = mRssiMean - mRssiMax - mRssiMin; //highest and lowest outliers
+                                mRssiMean = mRssiMean / (mRssiList.length-2);
+                                mDistance = Room.getInstance().getExponential(mRssiMean, -65);
+                                posEmp[numEmp][0]=BEACON_X*11.3/879;
+                                posEmp[numEmp][1]=BEACON_Y*11.3/879;
+                                double distancePX = mDistance;
+                                radius[numEmp] = distancePX;
+                                numEmp++;
+
+                                drawCircle(mDistance);
+
+                                TableLayout tl = ((TableLayout)mTextviewSelected.getParent().getParent());
+                                for (int i = 0 ; i<tl.getChildCount();i++){
+                                    if(((TextView)((TableRow)tl.getChildAt(i)).getChildAt(0)).isSelected()==false)
+                                    ((TextView)((TableRow)tl.getChildAt(i)).getChildAt(0)).setClickable(true);
+                                }
+                                if(mBeaconsSelected>1){
+                                    mBtnCalcPosition.setEnabled(true);
+                                }
                             }
-                            mRssiMean = mRssiMean/mRssiList.length;
-                            mDistance = Room.getInstance().getExponential(mRssiMean,-65);
-                            drawCircle(mDistance);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     };
+    private int mBeaconsSelected = 0;
+    private Button mBtnSetBeaconPos;
+    private TextView mTextviewSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +228,33 @@ public class RoomActivity extends AppCompatActivity {
         initBLE();
         pbPosSearch = (ProgressBar)findViewById(R.id.pB_posSearch);
         pbPosSearch.setMax(MEASUREMENTS);
-        mRssiList = new int[MEASUREMENTS];
 
         mIvCircle = (ImageView)findViewById(R.id.iV_Circle);
+        mTlBeacons = (TableLayout)findViewById(R.id.tl_Beacons);
+        mBtnCalcPosition =(Button)findViewById(R.id.btn_calcPosition);
+        mtBtnRefreshBeacons =(ToggleButton)findViewById(R.id.tBtn_findBeacons);
+
+        mtBtnRefreshBeacons.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mBmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
+                    mCanvas.setBitmap(mBmp);
+
+                    mTlBeacons.removeAllViews();
+                    scanBle(true);
+                    for(int i=0 ; i<mTlBeacons.getChildCount();i++){
+                        ((TextView)((TableRow)mTlBeacons.getChildAt(i)).getChildAt(0)).setOnClickListener(null);
+                    }
+                }else{
+                    scanBle(false);
+                    for(int i=0 ; i<mTlBeacons.getChildCount();i++){
+                        ((TextView)((TableRow)mTlBeacons.getChildAt(i)).getChildAt(0)).setOnClickListener(mOnClickListener);
+                    }
+                }
+            }
+        });
+        mBtnCalcPosition.setOnClickListener(mOnClickListener);
     }
 
     @Override
@@ -140,21 +270,9 @@ public class RoomActivity extends AppCompatActivity {
         }else{
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-        scanBle();
-    }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event){
-        BEACON_X = (int)event.getX()-50;
-        BEACON_Y = (int)event.getY()-160;
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN: drawCircle(mDistance); break;
-            case MotionEvent.ACTION_MOVE: break;
-            case MotionEvent.ACTION_UP:  break;
-        }
-        return false;
-    }
 
+    }
 
     private void initBLE(){
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)){
@@ -165,15 +283,28 @@ public class RoomActivity extends AppCompatActivity {
         mBluetoothAdapter = mBluetoothManager.getAdapter();
     }
 
-    private void scanBle(){
-        if (Build.VERSION.SDK_INT < 21) {
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-        } else {
-            try {
-                mBluetoothLeScanner.startScan(scanFilters, scanSettings, mScanCallback);
-            } catch (IllegalStateException e) {
-                Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.errorcode0x0011), Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+    private void scanBle(boolean enable){
+        if(enable){
+            if (Build.VERSION.SDK_INT < 21) {
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+            } else {
+                try {
+                    mBluetoothLeScanner.startScan(scanFilters, scanSettings, mScanCallback);
+                } catch (IllegalStateException e) {
+                    Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.errorcode0x0011), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            if (Build.VERSION.SDK_INT < 21) {
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            } else {
+                try {
+                    mBluetoothLeScanner.stopScan(mScanCallback);
+                } catch (IllegalStateException e) {
+                    Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.errorcode0x0011), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -184,36 +315,22 @@ public class RoomActivity extends AppCompatActivity {
         paint.setStyle(Paint.Style.FILL);
         paint.setAlpha(125);
 
-
-        Bitmap bmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(bmp);
-        canvas.drawCircle(BEACON_X,BEACON_Y , (float) r*mIvCircle.getWidth()/11, paint);
-
-        mIvCircle.setImageBitmap(bmp);
+        mCanvas.drawCircle(BEACON_X,BEACON_Y , (float) r*mIvCircle.getWidth()/11, paint);
+        mIvCircle.setImageBitmap(mBmp);
     }
 
-    /*
-    private class PositionSearchFragment extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(R.string.searchingPosition)
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            scanBle();
-                        }
-                    })
-                    .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
 
-                        }
-                    });
-            // Create the AlertDialog object and return
-            return builder.create();
-        }
+    private void addTableRow(String BeaconID) {
+        TableRow row = new TableRow(this);
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+        row.setMinimumHeight(50);
+        row.setLayoutParams(lp);
+        final TextView textView = new TextView(this);
+        textView.setBackgroundColor(Color.LTGRAY);
+        textView.setText(BeaconID);
+        textView.setClickable(true);
+        row.addView(textView);
+        mTlBeacons.addView(row);
     }
-    */
 
 }

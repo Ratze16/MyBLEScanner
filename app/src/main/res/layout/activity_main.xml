@@ -43,7 +43,15 @@
         android:id="@+id/sp_wifi"
         android:spinnerMode="dropdown"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/tBtn_scanBLE"
-        android:layout_marginStart="80dp" />
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/btn_RoomMain" />
+
+    <Button
+        android:text="@string/ShowRoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_RoomMain"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/tBtn_scanBLE" />
 
 </RelativeLayout>

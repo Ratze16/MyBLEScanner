@@ -258,9 +258,13 @@ public class MainActivity extends AppCompatActivity {
 
         lvWifiConnectionInfo = (ListView) findViewById(R.id.lv_WiFiConnectionInfo);
         spWiFi = (Spinner) findViewById(R.id.sp_wifi);
-
-
         mTvCamera = (TextureView)findViewById(R.id.tv_Camera);
+        findViewById(R.id.btn_RoomMain).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),RoomActivity.class));
+            }
+        });
     }
 
     // Checks if the Device supports BLE

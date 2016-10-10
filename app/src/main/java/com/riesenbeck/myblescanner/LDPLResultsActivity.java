@@ -102,7 +102,7 @@ public class LDPLResultsActivity extends AppCompatActivity {
                 TextView textView = new TextView(this);
                 String s = "K.A.";
                 BleDevice bleDevice1 = bleDevice[j];
-                if(bleDevice1 !=null) s =String.valueOf(bleDevice1.getmRssi());
+                if(bleDevice1 !=null) s = String.valueOf(bleDevice1.getmRssi());
                 textView.setText(s);
                 row.addView(textView,j);
             }
