@@ -24,23 +24,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".BLEResultActivity" />
         <activity
             android:name=".LDPLTestActivity"
             android:configChanges="keyboardHidden|orientation" />
         <activity android:name=".LDPLResultsActivity" />
-        <activity
-            android:name=".MapActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_map"
-            android:theme="@style/FullscreenTheme" />
-        <activity android:name=".RoomActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".RoomActivity" android:screenOrientation="landscape"><intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
     </application>
 
 </manifest>

@@ -29,24 +29,32 @@
         android:background="@drawable/room103"
         android:contentDescription="" />
 
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tBtn_findBeacons"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/iV_Circle" />
+
     <Button
         android:text="@string/calcPostion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_calcPosition"
+        android:enabled="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/iV_Circle"
-        android:enabled="false" />
-
+        android:layout_toEndOf="@+id/iV_Circle" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tBtn_findBeacons"
         android:layout_alignParentEnd="true"
-        android:layout_above="@+id/btn_calcPosition"
-        android:layout_toEndOf="@+id/iV_Circle">
+        android:layout_above="@+id/btn_initBeacons"
+        android:layout_toEndOf="@+id/iV_Circle"
+        android:layout_below="@+id/tBtn_findBeacons">
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -60,11 +68,12 @@
 
     </ScrollView>
 
-    <ToggleButton
+    <Button
+        android:text="@string/InitBeacons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tBtn_findBeacons"
-        android:layout_alignParentTop="true"
+        android:id="@+id/btn_initBeacons"
+        android:layout_above="@+id/btn_calcPosition"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/iV_Circle" />
 </RelativeLayout>

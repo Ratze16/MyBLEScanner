@@ -83,12 +83,18 @@ public class RoomActivity extends AppCompatActivity {
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(v==mBtnCalcPosition){
+            if(v == mBtnInitBeacons){
+                mBmp = Bitmap.createBitmap(findViewById(R.id.iV_Circle).getWidth(),findViewById(R.id.iV_Circle).getHeight(),Bitmap.Config.ARGB_8888);
+                mCanvas.setBitmap(mBmp);
+                initBeacons();
+            }
+            else if(v==mBtnCalcPosition){
                 double[] result = Trilateration.getInstance().dist2Pos(posEmp,radius,numEmp,posXY);
                 BEACON_X = (int)(result[0]/11.3*879);
                 BEACON_Y = (int)(result[1]/11.3*879);
                 mBmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
                 mCanvas.setBitmap(mBmp);
+                double errRad =result[2];
                 drawCircle(0.1);
                 drawCircle(result[2]);
             }else{
@@ -220,12 +226,15 @@ public class RoomActivity extends AppCompatActivity {
     private int mBeaconsSelected = 0;
     private Button mBtnSetBeaconPos;
     private TextView mTextviewSelected;
+    private double BEACON_X1, BEACON_Y1, BEACON_R1, BEACON_X2, BEACON_Y2, BEACON_R2;
+    private Button mBtnInitBeacons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
         initBLE();
+
         pbPosSearch = (ProgressBar)findViewById(R.id.pB_posSearch);
         pbPosSearch.setMax(MEASUREMENTS);
 
@@ -233,6 +242,7 @@ public class RoomActivity extends AppCompatActivity {
         mTlBeacons = (TableLayout)findViewById(R.id.tl_Beacons);
         mBtnCalcPosition =(Button)findViewById(R.id.btn_calcPosition);
         mtBtnRefreshBeacons =(ToggleButton)findViewById(R.id.tBtn_findBeacons);
+        mBtnInitBeacons = (Button) findViewById(R.id.btn_initBeacons);
 
         mtBtnRefreshBeacons.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -255,6 +265,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
         mBtnCalcPosition.setOnClickListener(mOnClickListener);
+        mBtnInitBeacons.setOnClickListener(mOnClickListener);
     }
 
     @Override
@@ -270,8 +281,6 @@ public class RoomActivity extends AppCompatActivity {
         }else{
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-
-
     }
 
     private void initBLE(){
@@ -315,7 +324,7 @@ public class RoomActivity extends AppCompatActivity {
         paint.setStyle(Paint.Style.FILL);
         paint.setAlpha(125);
 
-        mCanvas.drawCircle(BEACON_X,BEACON_Y , (float) r*mIvCircle.getWidth()/11, paint);
+        mCanvas.drawCircle(BEACON_X,BEACON_Y , (float) (r/11.3*879), paint);
         mIvCircle.setImageBitmap(mBmp);
     }
 
@@ -331,6 +340,34 @@ public class RoomActivity extends AppCompatActivity {
         textView.setClickable(true);
         row.addView(textView);
         mTlBeacons.addView(row);
+    }
+
+    private void initBeacons(){
+        BEACON_R1 = 0.9;
+        BEACON_X = 300;
+        BEACON_Y = 160;
+        drawCircle(BEACON_R1);
+        posEmp[0][0] = 300*11.3/879;
+        posEmp[0][1] = 150*11.3/879;
+        radius[0] = 0.9;
+
+        BEACON_R1 = 1.1;
+        BEACON_X = 378;
+        BEACON_Y = 150;
+        drawCircle(BEACON_R1);
+        posEmp[1][0] = 378*11.3/879;
+        posEmp[1][1] = 150*11.3/879;
+        radius[1] = 1.1;
+
+        BEACON_R1 = 1.1;
+        BEACON_X = 358;
+        BEACON_Y = 200;
+        drawCircle(BEACON_R1);
+        posEmp[2][0] = 358*11.3/879;
+        posEmp[2][1] = 200*11.3/879;
+        radius[2] = 1.1;
+
+        numEmp = 3;
     }
 
 }

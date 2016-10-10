@@ -56,4 +56,5 @@
     <string name="ShowRoom">Zeige Raum</string>
     <string name="Refresh">Aktualisieren</string>
     <string name="calcPostion">Berechne Position</string>
+    <string name="InitBeacons">Init Beacons</string>
 </resources>
