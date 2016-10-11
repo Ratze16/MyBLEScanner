@@ -347,27 +347,27 @@ public class RoomActivity extends AppCompatActivity {
         BEACON_X = 300;
         BEACON_Y = 160;
         drawCircle(BEACON_R1);
-        posEmp[0][0] = 300*11.3/879;
-        posEmp[0][1] = 150*11.3/879;
+        posEmp[0][0] = BEACON_X*11.3/879;
+        posEmp[0][1] = BEACON_Y*11.3/879;
         radius[0] = 0.9;
 
         BEACON_R1 = 1.1;
-        BEACON_X = 378;
+        BEACON_X = 500;
         BEACON_Y = 150;
         drawCircle(BEACON_R1);
-        posEmp[1][0] = 378*11.3/879;
-        posEmp[1][1] = 150*11.3/879;
+        posEmp[1][0] = BEACON_X*11.3/879;
+        posEmp[1][1] = BEACON_Y*11.3/879;
         radius[1] = 1.1;
 
         BEACON_R1 = 1.1;
-        BEACON_X = 358;
-        BEACON_Y = 200;
+        BEACON_X = 658;
+        BEACON_Y = 400;
         drawCircle(BEACON_R1);
-        posEmp[2][0] = 358*11.3/879;
-        posEmp[2][1] = 200*11.3/879;
+        posEmp[2][0] = BEACON_X*11.3/879;
+        posEmp[2][1] = BEACON_Y*11.3/879;
         radius[2] = 1.1;
 
-        numEmp = 3;
+        numEmp = 2;
     }
 
 }
