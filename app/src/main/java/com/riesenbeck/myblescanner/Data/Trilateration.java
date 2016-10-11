@@ -109,6 +109,10 @@ public class Trilateration {
 		 */
                     else if ((dist12 > (radius[0] + radius[1])) && (dist23 > (radius[1] + radius[2])))
                     {
+                        double[][] posRec = new double[][]{{posReceiver[0][0],posReceiver[0][1]},{posReceiver[2][0],posReceiver[2][1]},{posReceiver[1][0],posReceiver[1][1]}};
+                        double[] rad =new double[]{radius[0],radius[2],radius[1]};
+                        calc1Cutting(posRec,rad);
+                        /*
                         double p1[] = new double[2];
                         //Kreisschnittpunkte
                         double pos[][] = circlepoints2(posReceiver[0][0], posReceiver[0][1], posReceiver[2][0], posReceiver[2][1], radius[0], radius[2]);
@@ -130,10 +134,14 @@ public class Trilateration {
                             xPos_func = p1[0] + 0.5 * (pos[1][0] - p1[0]);
                             yPos_func = p1[1] + 0.5 * (pos[1][1] - p1[1]);
                             errRad_func = 0.5 * norm(pos[1][0], pos[1][1], p1[0], p1[1]);
-                        }
+                        }*/
                     }
                     else if ((dist12 > (radius[0] + radius[1])) && (dist13 > (radius[0] + radius[2])))
                     {
+                        double[][] posRec = new double[][]{{posReceiver[1][0],posReceiver[1][1]},{posReceiver[2][0],posReceiver[2][1]},{posReceiver[0][0],posReceiver[0][1]}};
+                        double[] rad =new double[]{radius[1],radius[2],radius[0]};
+                        calc1Cutting(posRec,rad);
+                        /*
                         double p1[] = new double[2];
                         //Kreisschnittpunkte
                         double pos[][] = circlepoints2(posReceiver[1][0], posReceiver[1][1], posReceiver[2][0], posReceiver[2][1], radius[1], radius[2]);
@@ -153,10 +161,14 @@ public class Trilateration {
                             xPos_func = p1[0] + 0.5 * (pos[1][0] - p1[0]);
                             yPos_func = p1[1] + 0.5 * (pos[1][1] - p1[1]);
                             errRad_func = 0.5 * norm(pos[1][0], pos[1][1], p1[0], p1[1]);
-                        }
+                        }*/
                     }
                     else if ((dist13 > (radius[0] + radius[2])) && (dist23 > (radius[1] + radius[2])))
                     {
+                        double[][] posRec = new double[][]{{posReceiver[0][0],posReceiver[0][1]},{posReceiver[1][0],posReceiver[1][1]},{posReceiver[2][0],posReceiver[2][1]}};
+                        double[] rad =new double[]{radius[0],radius[1],radius[2]};
+                        calc1Cutting(posRec,rad);
+                        /*
                         double p1[] = new double[2];
                         //Kreisschnittpunkte
                         double pos[][] = circlepoints2(posReceiver[0][0], posReceiver[0][1], posReceiver[1][0], posReceiver[1][1], radius[0], radius[1]);
@@ -177,7 +189,7 @@ public class Trilateration {
                             xPos_func = p1[0] + 0.5 * (pos[1][0] - p1[0]);
                             yPos_func = p1[1] + 0.5 * (pos[1][1] - p1[1]);
                             errRad_func = 0.5 * norm(pos[1][0], pos[1][1], p1[0], p1[1]);
-                        }
+                        }*/
                     }
                     else if ((dist12 > (radius[0] + radius[1])))
                     {
@@ -329,8 +341,12 @@ public class Trilateration {
                         double pos12[][] = circlepoints2(posReceiver[0][0], posReceiver[0][1], posReceiver[1][0], posReceiver[1][1], radius[0], radius[1]);
                         double pos23[][] = circlepoints2(posReceiver[1][0], posReceiver[1][1], posReceiver[2][0], posReceiver[2][1], radius[1], radius[2]);
                         double pos13[][] = circlepoints2(posReceiver[0][0], posReceiver[0][1], posReceiver[2][0], posReceiver[2][1], radius[0], radius[2]);
-                        distS1_1a = norm(pos12[0][0], pos12[0][1], pos23[0][0], pos23[0][1]);
-                        distS2_1a = norm(pos12[1][0], pos12[1][1], pos23[0][0], pos23[0][1]);
+
+                        //distS1_1a = norm(pos12[0][0], pos12[0][1], pos23[0][0], pos23[0][1]);
+                        //distS2_1a = norm(pos12[1][0], pos12[1][1], pos23[0][0], pos23[0][1]);
+                        //Distanzen zu Punkte der Kreisschnitte 23
+                        distS1_1a = Math.sqrt(Math.pow(pos12[0][0] - pos23[0][0], 2) + Math.pow(pos12[0][1] - pos23[0][1], 2));
+                        distS2_1a = Math.sqrt(Math.pow(pos12[1][0] - pos23[0][0], 2) + Math.pow(pos12[1][1] - pos23[0][1], 2));
                         distS1_1b = Math.sqrt(Math.pow(pos13[0][0] - pos23[0][0], 2) + Math.pow(pos13[0][1] - pos23[0][1], 2));
                         distS2_1b = Math.sqrt(Math.pow(pos13[1][0] - pos23[0][0], 2) + Math.pow(pos13[1][1] - pos23[0][1], 2));
                         distS1_2a = Math.sqrt(Math.pow(pos12[0][0] - pos23[1][0], 2) + Math.pow(pos12[0][1] - pos23[1][1], 2));
@@ -338,6 +354,7 @@ public class Trilateration {
                         distS1_2b = Math.sqrt(Math.pow(pos13[0][0] - pos23[1][0], 2) + Math.pow(pos12[0][1] - pos23[1][1], 2));
                         distS2_2b = Math.sqrt(Math.pow(pos13[1][0] - pos23[1][0], 2) + Math.pow(pos12[1][1] - pos23[1][1], 2));
 
+                        //Wählen der geringsten Entfernung von Punkt 12 zu 23
                         if (distS1_1a <= distS2_1a)
                         {
                             p1_1[0] = pos12[0][0]; //x-P1
@@ -350,6 +367,7 @@ public class Trilateration {
                             p1_1[1] = pos12[1][1]; //y-P1
                             smallestDist_1a = distS2_1a;
                         }
+                        //Wählen der geringsten Entfernung von Punkt 12 zu 23
                         if (distS1_1b <= distS2_1b)
                         {
                             p2_1[0] = pos13[0][0]; //x-P1
@@ -362,6 +380,7 @@ public class Trilateration {
                             p2_1[1] = pos13[1][1]; //y-P1
                             smallestDist_1b = distS2_1b;
                         }
+                        //Wählen der geringsten Entfernung von Punkt 13 zu 23
                         if (distS1_2a <= distS2_2a)
                         {
                             p1_2[0] = pos12[0][0]; //x-P1
@@ -374,6 +393,7 @@ public class Trilateration {
                             p1_2[1] = pos12[1][1]; //y-P1
                             smallestDist_2a = distS2_2a;
                         }
+                        //Wählen der geringsten Entfernung von Punkt 13 zu 23
                         if (distS1_2b <= distS2_2b)
                         {
                             p2_2[0] = pos13[0][0]; //x-P2
@@ -386,6 +406,7 @@ public class Trilateration {
                             p2_2[1] = pos13[1][1]; //y-P2
                             smallestDist_2b = distS2_2b;
                         }
+                        //Wählen der Geringsten entfernung von 12 und 13 zu 23 und erstellen des kleinsten Dreiecks
                         if (smallestDist_1a + smallestDist_1b <= smallestDist_2a + smallestDist_2b)
                         {
                             A[0] = pos23[0][0];
@@ -397,6 +418,7 @@ public class Trilateration {
                         }
                         else
                         {
+
                             A[0] = pos23[1][0];
                             A[1] = pos23[1][1];
                             B[0] = p1_2[0];
@@ -409,8 +431,8 @@ public class Trilateration {
                         b_p = Math.sqrt(B[0]* B[0] + B[1]* B[1]);
                         c_p = Math.sqrt(C[0]* C[0] + C[1]* C[1]);
                         denominator = 2 * ((A[0] * B[1] - A[1] * B[0]) + (B[0] * C[1] - B[1] * C[0]) + (C[0] * A[1] - C[1] * A[0]));
-                        xPos_func = (1.0/denominator)*(((b_p*b_p) - (c_p*c_p))*(-A[1]) + ((c_p*c_p) - (a_p*a_p))* (-B[1]) + ((a_p*a_p) - (b_p*b_p))*(-C[1]));
-                        yPos_func = (1.0/denominator)*(((b_p*b_p) - (c_p*c_p))*A[0] + ((c_p*c_p) - (a_p*a_p))* B[1] + ((a_p*a_p) - (b_p*b_p))*C[0]);
+                        xPos_func = (1.0/denominator)*((b_p*b_p - c_p*c_p)*(-A[1]) + (c_p*c_p - a_p*a_p)* (-B[1]) + (a_p*a_p - b_p*b_p)*(-C[1]));
+                        yPos_func = (1.0/denominator)*((b_p*b_p - c_p*c_p)*A[0] + (c_p*c_p - a_p*a_p)* B[0] + (a_p*a_p - b_p*b_p)*C[0]);
                         errRad_func = norm(xPos_func, yPos_func, A[0], A[1]);
                     }
                 }
@@ -424,7 +446,14 @@ public class Trilateration {
 
     private double[][] circlepoints2(double x1, double y1, double x2, double y2, double rad1, double rad2){
         double[][] pos = new double[2][2]; //Kreisschnittpunkte;
-
+        double y= y1-y2;
+        double x= x2-x1;
+        if(y1==y2){
+            y1=y1+0.000001;
+        }
+        if(x2==x1){
+            x2=x2+0.000001;
+        }
         double t1 = (y1 - y2) / (x2 - x1);
         double t2 = (x2 * x2 - x1 * x1 + y2 * y2 - y1 * y1 + rad1 * rad1 - rad2 * rad2) /(2.0 * x2 - 2.0 * x1);
         double a_circ = (t1*t1 + 1.0);
@@ -453,4 +482,30 @@ public class Trilateration {
         return  trilaterationRef;
     }
 
+    public void calc1Cutting(double[][] posRec, double[] rad){
+        double[][] posReceiver = posRec;
+        double[] radius = rad;
+        double p1[] = new double[2];
+        //Kreisschnittpunkte
+        double pos[][] = circlepoints2(posReceiver[0][0], posReceiver[0][1], posReceiver[1][0], posReceiver[1][1], radius[0], radius[1]);
+        distS1 = Math.sqrt(Math.pow(posReceiver[2][0] - pos[0][0], 2) + Math.pow(posReceiver[2][1] - pos[0][1], 2));
+        distS2 = Math.sqrt(Math.pow(posReceiver[2][0] - pos[1][0], 2) + Math.pow(posReceiver[2][1] - pos[1][1], 2));
+
+        if (distS1 <= distS2)
+        {
+            p1[0] = posReceiver[2][0] + (radius[1]/distS1) * (pos[0][0] - posReceiver[2][0]); //x-P1
+            p1[1] = posReceiver[2][1] + (radius[1]/distS1) * (pos[0][1] - posReceiver[2][1]); //y-P1
+            xPos_func = p1[0] + 0.5 * (pos[0][0] - p1[0]);
+            yPos_func = p1[1] + 0.5 * (pos[0][1] - p1[1]);
+            errRad_func = 0.5 * norm(pos[0][0], pos[0][1],p1[0], p1[1]);
+        }
+        else
+        {
+            p1[0] = posReceiver[2][0] + (radius[1]/distS2) * (pos[1][0] - posReceiver[2][0]); //x-P1
+            p1[1] = posReceiver[2][1] + (radius[1]/distS2) * (pos[1][1] - posReceiver[2][1]); //y-P1
+            xPos_func = p1[0] + 0.5 * (pos[1][0] - p1[0]);
+            yPos_func = p1[1] + 0.5 * (pos[1][1] - p1[1]);
+            errRad_func = 0.5 * norm(pos[1][0], pos[1][1], p1[0], p1[1]);
+        }
+    }
 }

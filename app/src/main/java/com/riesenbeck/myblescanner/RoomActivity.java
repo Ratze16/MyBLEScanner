@@ -78,7 +78,8 @@ public class RoomActivity extends AppCompatActivity {
     private double[] posXY = new double[2];
 
     private Bitmap mBmp;
-    private Canvas mCanvas = new Canvas();;
+    private Canvas mCanvas = new Canvas();
+    private int mBeaconCase=0;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -86,17 +87,56 @@ public class RoomActivity extends AppCompatActivity {
             if(v == mBtnInitBeacons){
                 mBmp = Bitmap.createBitmap(findViewById(R.id.iV_Circle).getWidth(),findViewById(R.id.iV_Circle).getHeight(),Bitmap.Config.ARGB_8888);
                 mCanvas.setBitmap(mBmp);
-                initBeacons();
+                double pos[][];
+                double rad[];
+                int num;
+                switch(mBeaconCase){
+                    case 0: //Keine Überschneidung
+                        //0,0 bis 879,558
+                        //0,0 bis 11.30,7,1
+                        pos = new double[][]{{1.0, 1.0}, {2.5, 1.5}, {1.5, 3.5}};
+                        rad = new double[]{0.5, 1.0, 0.6};
+                        num = 3;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 1: //1 und 2 überschneiden sich
+                        pos = new double[][]{{1.0, 1.0}, {2.0, 1.5}, {1.5, 3.5}};
+                        rad = new double[]{0.5, 1.0, 0.6};
+                        num = 3;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 2: //1, 2 und 3 überscheneiden sich
+                        pos = new double[][]{{1.0, 1.0}, {1.5, 1.5}, {1.5, 2.0}};
+                        rad = new double[]{0.5, 1.5, 0.6};
+                        num = 3;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 3:  //1, 2 und 3 überscheneiden sich
+                        pos = new double[][]{{1.0, 1.0}, {2.0,1.0}, {1.5, 1.5}};
+                        rad = new double[]{0.5, 1.0, 0.6};
+                        num = 3;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 4:  //nur zwei Kreise, 1 und 2 überschneiden sich
+                        pos = new double[][]{{1.0, 1.0}, {2.0,1.0}};
+                        rad = new double[]{0.5, 1.0};
+                        num = 2;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 5:  //nur zwei Kreise, keine überschneidung
+                        pos = new double[][]{{1.0, 1.0}, {2.0,2.5}};
+                        rad = new double[]{0.5, 1.0, 0.6};
+                        num = 2;
+                        initBeacons(pos,rad ,num);
+                        mBeaconCase=0;break;
+                }
             }
             else if(v==mBtnCalcPosition){
                 double[] result = Trilateration.getInstance().dist2Pos(posEmp,radius,numEmp,posXY);
                 BEACON_X = (int)(result[0]/11.3*879);
                 BEACON_Y = (int)(result[1]/11.3*879);
-                mBmp = Bitmap.createBitmap(mIvCircle.getWidth(),mIvCircle.getHeight(),Bitmap.Config.ARGB_8888);
-                mCanvas.setBitmap(mBmp);
-                double errRad =result[2];
-                drawCircle(0.1);
-                drawCircle(result[2]);
+                drawCircle(0.1/11.3*879, Color.GREEN);
+                drawCircle(result[2]/11.3*879,Color.GREEN);
             }else{
                 mTextviewSelected = (TextView) v;
 
@@ -119,7 +159,7 @@ public class RoomActivity extends AppCompatActivity {
             mBleDeviceSearchAddress = String.valueOf(mTextviewSelected.getText());
             mBeaconsSelected++;
             mTextviewSelected.setBackgroundColor(Color.RED);
-            drawCircle(0.1);
+            drawCircle(0.1,Color.RED);
             mIvCircle.setOnTouchListener(null);
 
             mTextviewSelected.setSelected(true);
@@ -202,7 +242,7 @@ public class RoomActivity extends AppCompatActivity {
                                 radius[numEmp] = distancePX;
                                 numEmp++;
 
-                                drawCircle(mDistance);
+                                drawCircle(mDistance,Color.RED);
 
                                 TableLayout tl = ((TableLayout)mTextviewSelected.getParent().getParent());
                                 for (int i = 0 ; i<tl.getChildCount();i++){
@@ -318,13 +358,14 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    private void drawCircle(double r){
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setAlpha(125);
+    private void drawCircle(double r, int color){
 
-        mCanvas.drawCircle(BEACON_X,BEACON_Y , (float) (r/11.3*879), paint);
+        Paint paint = new Paint();
+        paint.setColor(color);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(80);
+
+        mCanvas.drawCircle(BEACON_X,BEACON_Y , (float) (r), paint);
         mIvCircle.setImageBitmap(mBmp);
     }
 
@@ -342,32 +383,15 @@ public class RoomActivity extends AppCompatActivity {
         mTlBeacons.addView(row);
     }
 
-    private void initBeacons(){
-        BEACON_R1 = 0.9;
-        BEACON_X = 300;
-        BEACON_Y = 160;
-        drawCircle(BEACON_R1);
-        posEmp[0][0] = BEACON_X*11.3/879;
-        posEmp[0][1] = BEACON_Y*11.3/879;
-        radius[0] = 0.9;
-
-        BEACON_R1 = 1.1;
-        BEACON_X = 500;
-        BEACON_Y = 150;
-        drawCircle(BEACON_R1);
-        posEmp[1][0] = BEACON_X*11.3/879;
-        posEmp[1][1] = BEACON_Y*11.3/879;
-        radius[1] = 1.1;
-
-        BEACON_R1 = 1.1;
-        BEACON_X = 658;
-        BEACON_Y = 400;
-        drawCircle(BEACON_R1);
-        posEmp[2][0] = BEACON_X*11.3/879;
-        posEmp[2][1] = BEACON_Y*11.3/879;
-        radius[2] = 1.1;
-
-        numEmp = 2;
+    private void initBeacons(double[][] pos, double[] rad, int num ){
+        posEmp = pos;
+        radius = rad;
+        numEmp= num;
+        for(int i=0; i<posEmp.length;i++){
+            BEACON_X = (int) (posEmp[i][0]/11.3*879);
+            BEACON_Y = (int) (posEmp[i][1]/11.3*879);
+            drawCircle(radius[i]/11.3*879,Color.RED);
+        }
     }
 
 }
