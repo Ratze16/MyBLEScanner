@@ -1,19 +1,19 @@
-package com.riesenbeck.myblescanner.Data;
+package com.riesenbeck.myblescanner.Old;
 
 /**
  * Created by Michael Riesenbeck on 06.10.2016.
  */
 
-public class Trilateration {
+public class TrilaterationOld {
 
-    public static Trilateration trilaterationRef;
+    public static TrilaterationOld trilaterationOldRef;
     private double xPos_func, yPos_func, errRad_func;
     private boolean init = false;
     private static double dist12, dist13, dist23, norm12, norm23, norm31, distS1, distS2, distS1_1,
             distS1_2, distS2_1, distS2_2, distS1_1a, distS2_1a, distS1_1b, distS2_1b,  distS1_2a,
             distS2_2a, distS1_2b, distS2_2b, a_p , b_p, c_p, denominator;
 
-    private Trilateration(){}
+    private TrilaterationOld(){}
 
     public double[] dist2Pos(double[][] posReceiver, double[] radius, int numEmp, double[] posXY){
         switch(numEmp){
@@ -409,11 +409,11 @@ public class Trilateration {
     }
 
 
-    public static Trilateration getInstance(){
-        if (trilaterationRef==null){
-            trilaterationRef = new Trilateration();
+    public static TrilaterationOld getInstance(){
+        if (trilaterationOldRef ==null){
+            trilaterationOldRef = new TrilaterationOld();
         }
-        return  trilaterationRef;
+        return trilaterationOldRef;
     }
 
     public void calc1Cutting(double[][] posRec, double[] rad){

@@ -51,6 +51,7 @@ import android.widget.ToggleButton;
 
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
+import com.riesenbeck.myblescanner.Data.IpsDataSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private IpsDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        initSQLite();
         initBLE();
         initWiFi();
 
@@ -265,6 +268,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(),RoomActivity.class));
             }
         });
+    }
+
+    private void initSQLite(){
+        dataSource = new IpsDataSource(this);
     }
 
     // Checks if the Device supports BLE

@@ -1,8 +1,5 @@
 package com.riesenbeck.myblescanner;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -12,16 +9,12 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.inputmethodservice.Keyboard;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +22,6 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,8 +32,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.riesenbeck.myblescanner.Data.BleDevice;
+import com.riesenbeck.myblescanner.Data.IpsDataSource;
+import com.riesenbeck.myblescanner.Data.Position;
 import com.riesenbeck.myblescanner.Data.Room;
-import com.riesenbeck.myblescanner.Data.Trilateration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,21 +85,21 @@ public class RoomActivity extends AppCompatActivity {
                 int num;
                 switch(mBeaconCase){
                     case 0: //Keine Überschneidung
-                        //0,0 bis 879,558
-                        //0,0 bis 11.30,7,1
-                        pos = new double[][]{{1.0, 1.0}, {2.5, 1.5}, {1.5, 3.5}};
+                        //[0,0] bis [879,558] Pixel
+                        //[0,0] bis [11.30,7,1] Meter
+                        pos = new double[][]{{1.0, 1.0}, {2.5, 1.5}, {1.5, 3.0}};
                         rad = new double[]{0.5, 1.0, 0.6};
                         num = 3;
                         initBeacons(pos,rad ,num);
                         mBeaconCase++;break;
                     case 1: //1 und 2 überschneiden sich
-                        pos = new double[][]{{1.0, 1.0}, {2.0, 1.5}, {1.5, 3.5}};
-                        rad = new double[]{0.5, 1.0, 0.6};
+                        pos = new double[][]{{1.0, 1.0}, {2.0, 0.9}, {1.5, 3.0}};
+                        rad = new double[]{0.5, 0.8, 0.6};
                         num = 3;
                         initBeacons(pos,rad ,num);
                         mBeaconCase++;break;
                     case 2: //1, 2 und 3 überscheneiden sich
-                        pos = new double[][]{{1.0, 1.0}, {1.5, 1.5}, {1.5, 2.0}};
+                        pos = new double[][]{{2.2, 1.0}, {1.5, 1.5}, {1.6, 2.3}};
                         rad = new double[]{0.5, 1.5, 0.6};
                         num = 3;
                         initBeacons(pos,rad ,num);
@@ -118,9 +111,9 @@ public class RoomActivity extends AppCompatActivity {
                         initBeacons(pos,rad ,num);
                         mBeaconCase++;break;
                     case 4:  //nur zwei Kreise, 1 und 2 überschneiden sich
-                        pos = new double[][]{{1.0, 1.0}, {2.0,1.0}};
-                        rad = new double[]{0.5, 1.0};
-                        num = 2;
+                        pos = new double[][]{{2.0, 2.0,}, {2.5,2.5},{3.0,4.0}};
+                        rad = new double[]{1.5, 0.5, 0.5};
+                        num = 3;
                         initBeacons(pos,rad ,num);
                         mBeaconCase++;break;
                     case 5:  //nur zwei Kreise, keine überschneidung
@@ -128,15 +121,23 @@ public class RoomActivity extends AppCompatActivity {
                         rad = new double[]{0.5, 1.0, 0.6};
                         num = 2;
                         initBeacons(pos,rad ,num);
+                        mBeaconCase++;break;
+                    case 6:  //nur zwei Kreise, 1 und 2 überschneiden sich
+                        pos = new double[][]{{1.0, 1.0}, {2.0,1.0}};
+                        rad = new double[]{0.5, 1.0};
+                        num = 2;
+                        initBeacons(pos,rad ,num);
                         mBeaconCase=0;break;
                 }
             }
             else if(v==mBtnCalcPosition){
-                double[] result = Trilateration.getInstance().dist2Pos(posEmp,radius,numEmp,posXY);
-                BEACON_X = (int)(result[0]/11.3*879);
-                BEACON_Y = (int)(result[1]/11.3*879);
+                //double[] result = TrilaterationOld.getInstance().dist2Pos(posEmp,radius,numEmp,posXY);
+                Position position = new Position(posEmp,radius,numEmp);
+                double[] lastPosition = position.getLastPosition();
+                BEACON_X = (int)(lastPosition[0]/11.3*879);
+                BEACON_Y = (int)(lastPosition[1]/11.3*879);
                 drawCircle(0.1/11.3*879, Color.GREEN);
-                drawCircle(result[2]/11.3*879,Color.GREEN);
+                drawCircle(lastPosition[2]/11.3*879,Color.GREEN);
             }else{
                 mTextviewSelected = (TextView) v;
 
@@ -268,6 +269,7 @@ public class RoomActivity extends AppCompatActivity {
     private TextView mTextviewSelected;
     private double BEACON_X1, BEACON_Y1, BEACON_R1, BEACON_X2, BEACON_Y2, BEACON_R2;
     private Button mBtnInitBeacons;
+    private IpsDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -306,6 +308,8 @@ public class RoomActivity extends AppCompatActivity {
         });
         mBtnCalcPosition.setOnClickListener(mOnClickListener);
         mBtnInitBeacons.setOnClickListener(mOnClickListener);
+
+        dataSource = new IpsDataSource(this);
     }
 
     @Override
