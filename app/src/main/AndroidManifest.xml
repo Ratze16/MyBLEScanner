@@ -23,15 +23,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.MainActivity">
 
         </activity>
-        <activity android:name=".BLEResultActivity" />
+        <activity android:name=".Activity.BLEResultActivity" />
         <activity
-            android:name=".LDPLTestActivity"
+            android:name=".Activity.LDPLTestActivity"
             android:configChanges="keyboardHidden|orientation" />
-        <activity android:name=".LDPLResultsActivity" />
-        <activity android:name=".RoomActivity" android:screenOrientation="landscape"><intent-filter>
+        <activity android:name=".Activity.LDPLResultsActivity" />
+        <activity android:name=".Activity.RoomActivity" android:screenOrientation="landscape"><intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />

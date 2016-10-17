@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.riesenbeck.myblescanner.MainActivity">
+    tools:context="com.riesenbeck.myblescanner.Activity.MainActivity">
 
     <TextureView
         android:layout_width="wrap_content"

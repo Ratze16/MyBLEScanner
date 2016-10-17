@@ -1,4 +1,4 @@
-package com.riesenbeck.myblescanner;
+package com.riesenbeck.myblescanner.Activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,11 +20,14 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -31,16 +35,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.riesenbeck.myblescanner.Data.Beacon;
 import com.riesenbeck.myblescanner.Data.BleDevice;
-import com.riesenbeck.myblescanner.Data.IpsDataSource;
+import com.riesenbeck.myblescanner.DB.IpsDataSource;
 import com.riesenbeck.myblescanner.Data.Position;
 import com.riesenbeck.myblescanner.Data.Room;
+import com.riesenbeck.myblescanner.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class RoomActivity extends AppCompatActivity {
+    private static final String LOG_TAG = RoomActivity.class.getSimpleName();
     private static int BEACON_X = 0, BEACON_Y = 0;
     private final int MEASUREMENTS = 10;
     private int mPosSearchStatus = 0;
@@ -239,11 +246,15 @@ public class RoomActivity extends AppCompatActivity {
                                 mDistance = Room.getInstance().getExponential(mRssiMean, -65);
                                 posEmp[numEmp][0]=BEACON_X*11.3/879;
                                 posEmp[numEmp][1]=BEACON_Y*11.3/879;
-                                double distancePX = mDistance;
-                                radius[numEmp] = distancePX;
+                                radius[numEmp] = mDistance;
                                 numEmp++;
 
                                 drawCircle(mDistance,Color.RED);
+
+                                dataSource.open();
+                                dataSource.createBeacon(2,BEACON_X,BEACON_Y,0.0,mBleDeviceSearchAddress,(int)mRssiMean);
+                                showAllListEntries();
+                                dataSource.close();
 
                                 TableLayout tl = ((TableLayout)mTextviewSelected.getParent().getParent());
                                 for (int i = 0 ; i<tl.getChildCount();i++){
@@ -310,6 +321,18 @@ public class RoomActivity extends AppCompatActivity {
         mBtnInitBeacons.setOnClickListener(mOnClickListener);
 
         dataSource = new IpsDataSource(this);
+
+        Log.d(LOG_TAG, "Die Datenquelle wird geöffnet.");
+        dataSource.open();
+
+        Beacon beacon = dataSource.createBeacon(1,2.0,3.0,4.0,"Adresse",100);
+        Log.d(LOG_TAG, "Datenbankeintrag: ID:"+ beacon.getId()+", Adresse: "+beacon.getAddresse());
+
+        showAllListEntries();
+
+        Log.d(LOG_TAG, "Die Datenquelle wird geschlossen.");
+        dataSource.close();
+
     }
 
     @Override
@@ -373,7 +396,6 @@ public class RoomActivity extends AppCompatActivity {
         mIvCircle.setImageBitmap(mBmp);
     }
 
-
     private void addTableRow(String BeaconID) {
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
@@ -396,6 +418,21 @@ public class RoomActivity extends AppCompatActivity {
             BEACON_Y = (int) (posEmp[i][1]/11.3*879);
             drawCircle(radius[i]/11.3*879,Color.RED);
         }
+    }
+    private void showAllListEntries () {
+        List<Beacon> beaconList = dataSource.getAllBeacons();
+        List<String> beaconStringList = new ArrayList<String>();
+        for(Beacon b: beaconList){
+            beaconStringList.add(b.getAddresse());
+        }
+
+        ArrayAdapter<String> beaconStringArrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_multiple_choice,
+                beaconStringList);
+
+        ListView beaconListView = (ListView) findViewById(R.id.lv_BeaconsDB);
+        beaconListView.setAdapter(beaconStringArrayAdapter);
     }
 
 }

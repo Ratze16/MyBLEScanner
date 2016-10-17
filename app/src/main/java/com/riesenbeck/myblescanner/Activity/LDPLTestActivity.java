@@ -1,4 +1,4 @@
-package com.riesenbeck.myblescanner;
+package com.riesenbeck.myblescanner.Activity;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
@@ -26,10 +26,10 @@ import android.widget.Toast;
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
 import com.riesenbeck.myblescanner.Data.LDPLResults;
+import com.riesenbeck.myblescanner.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RunnableFuture;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LDPLTestActivity extends AppCompatActivity {

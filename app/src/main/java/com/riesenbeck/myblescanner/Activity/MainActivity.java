@@ -1,4 +1,4 @@
-package com.riesenbeck.myblescanner;
+package com.riesenbeck.myblescanner.Activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -51,7 +51,8 @@ import android.widget.ToggleButton;
 
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
-import com.riesenbeck.myblescanner.Data.IpsDataSource;
+import com.riesenbeck.myblescanner.DB.IpsDataSource;
+import com.riesenbeck.myblescanner.R;
 
 import java.util.ArrayList;
 import java.util.Collections;

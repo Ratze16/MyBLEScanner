@@ -1,4 +1,4 @@
-package com.riesenbeck.myblescanner;
+package com.riesenbeck.myblescanner.Activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.riesenbeck.myblescanner.Data.BleDevice;
 import com.riesenbeck.myblescanner.Data.BLEResults;
+import com.riesenbeck.myblescanner.R;
 
 public class BLEResultActivity extends AppCompatActivity {
 
