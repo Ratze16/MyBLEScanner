@@ -251,10 +251,8 @@ public class RoomActivity extends AppCompatActivity {
 
                                 drawCircle(mDistance,Color.RED);
 
-                                dataSource.open();
                                 dataSource.createBeacon(2,BEACON_X,BEACON_Y,0.0,mBleDeviceSearchAddress,(int)mRssiMean);
                                 showAllListEntries();
-                                dataSource.close();
 
                                 TableLayout tl = ((TableLayout)mTextviewSelected.getParent().getParent());
                                 for (int i = 0 ; i<tl.getChildCount();i++){
@@ -322,6 +320,13 @@ public class RoomActivity extends AppCompatActivity {
 
         dataSource = new IpsDataSource(this);
 
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
         Log.d(LOG_TAG, "Die Datenquelle wird geöffnet.");
         dataSource.open();
 
@@ -329,15 +334,6 @@ public class RoomActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Datenbankeintrag: ID:"+ beacon.getId()+", Adresse: "+beacon.getAddresse());
 
         showAllListEntries();
-
-        Log.d(LOG_TAG, "Die Datenquelle wird geschlossen.");
-        dataSource.close();
-
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
 
         if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()){
             if(Build.VERSION.SDK_INT >=21){
@@ -348,6 +344,14 @@ public class RoomActivity extends AppCompatActivity {
         }else{
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Log.d(LOG_TAG, "Die Datenquelle wird geschlossen.");
+        dataSource.close();
     }
 
     private void initBLE(){

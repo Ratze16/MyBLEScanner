@@ -19,16 +19,6 @@
         android:layout_marginEnd="522dp"
         android:id="@+id/pB_posSearch" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/iV_Circle"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/room103"
-        android:contentDescription="" />
-
 
     <ToggleButton
         android:layout_width="wrap_content"
@@ -45,6 +35,16 @@
         android:id="@+id/btn_calcPosition"
         android:enabled="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/iV_Circle" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lv_BeaconsDB"
+        android:background="@android:color/white"
+        android:alpha="0.5"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/iV_Circle" />
 
@@ -77,13 +77,13 @@
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/iV_Circle" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/lv_BeaconsDB"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/iV_Circle"
+        android:background="@drawable/room103"
+        android:contentDescription=""
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/tBtn_findBeacons"
-        android:layout_marginLeft="400px"
-        android:background="@android:color/white"
-        android:alpha="0.5" />
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

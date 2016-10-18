@@ -32,7 +32,6 @@ public class IpsDataSource {
             IpsDbHelper.BEACON_RSSI
     };
 
-
     public IpsDataSource(Context context) {
         Log.d(LOG_TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
         dbHelper = new IpsDbHelper(context);
